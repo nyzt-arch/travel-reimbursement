@@ -37,3 +37,15 @@ __screenshots__/
 
 # Vite
 *.timestamp-*-*.mjs
+.vite
+.eslintcache
+
+# Java / Backend
+target/
+*.class
+.idea/
+*.iml
+out/
+.gradle/
+build/
+
