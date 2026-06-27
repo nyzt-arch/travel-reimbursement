@@ -161,7 +161,7 @@ const handleSaveTrip = (tripForm: Trip) => {
     <ConfirmDialog 
       :show="showConfirmDelete"
       title="提示"
-      message="确认删除该行程吗？关联的补助及日历信息也将被联动删除。"
+      message="确认删除？"
       type="danger"
       @confirm="confirmDelete"
       @cancel="cancelDelete"

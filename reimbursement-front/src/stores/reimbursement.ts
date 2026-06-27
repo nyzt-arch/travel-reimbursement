@@ -82,6 +82,58 @@ export const useReimbursementStore = defineStore('reimbursement', {
       }
     ];
 
+    const mockTrip2: Trip[] = [
+      {
+        id: 'T002',
+        reimId: 'R002',
+        travelerId: 'E002', // 张三
+        departCityNo: '420100', // 武汉
+        arriveCityNo: '110000', // 北京
+        departDate: '2026-06-25',
+        arriveDate: '2026-06-29',
+        tripDesc: '华中地区日常技术支持与外部会议对接'
+      }
+    ];
+
+    const mockCalendar2: SubsidyCalendar[] = [];
+    const dates2 = ['2026-06-25', '2026-06-26', '2026-06-27', '2026-06-28', '2026-06-29'];
+    const weekdays2 = ['星期四', '星期五', '星期六', '星期日', '星期一'];
+    
+    dates2.forEach((date, i) => {
+      mockCalendar2.push({
+        id: `C_M2_${i}`,
+        subsidyInfoId: 'S002',
+        subsidyDate: date,
+        weekDay: weekdays2[i] || '',
+        cityNo: '110000', // 北京 (一线) -> 餐100, 交40, 通40
+        mealChecked: 1,
+        mealStandard: 100,
+        mealAmount: 100,
+        transportChecked: 1,
+        transportStandard: 40,
+        transportAmount: 40,
+        commChecked: 1,
+        commStandard: 40,
+        commAmount: 40
+      });
+    });
+
+    const mockSubsidy2: SubsidyInfo[] = [
+      {
+        id: 'S002',
+        reimId: 'R002',
+        tripId: 'T002',
+        travelerId: 'E002',
+        startDate: '2026-06-25',
+        endDate: '2026-06-29',
+        subsidyDays: 5,
+        subsidyCityNo: '110000',
+        applyAmount: 900,
+        subsidyAmount: 900,
+        calendars: mockCalendar2
+      }
+    ];
+
     return {
       reimbursements: [
         {
@@ -114,16 +166,16 @@ export const useReimbursementStore = defineStore('reimbursement', {
           reimDepartmentId: 'D002',
           reimCompanyId: 'C003', // 武汉分公司
           businessTypeId: 'B0010102', // 日常出差
-          subsidyTotal: 0,
-          mealSubsidyTotal: 0,
-          transportSubsidyTotal: 0,
-          commSubsidyTotal: 0,
+          subsidyTotal: 900,
+          mealSubsidyTotal: 500,
+          transportSubsidyTotal: 200,
+          commSubsidyTotal: 200,
           remark: '',
           status: 0, // 草稿
           createTime: '2026-06-25 09:12:00',
           updateTime: '2026-06-25 09:12:00',
-          trips: [],
-          subsidies: [],
+          trips: mockTrip2,
+          subsidies: mockSubsidy2,
           allocations: [
             {
               id: 'A003',
@@ -131,7 +183,7 @@ export const useReimbursementStore = defineStore('reimbursement', {
               companyId: 'C003',
               projectId: 'P002',
               allocRatio: 1.0,
-              allocAmount: 0,
+              allocAmount: 900,
               sortOrder: 1
             }
           ]

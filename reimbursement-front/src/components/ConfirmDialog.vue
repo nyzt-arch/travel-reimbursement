@@ -88,39 +88,12 @@ const emit = defineEmits(['confirm', 'cancel']);
   max-width: 90%;
 }
 
-.dialog-header {
-  padding: 14px 20px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  border-bottom: 1px solid var(--gray-200);
-}
-
 .header-warning {
   border-bottom-color: var(--warning-border);
 }
 
 .header-danger {
   border-bottom-color: var(--danger-border);
-}
-
-.dialog-title {
-  font-size: 16px;
-  font-weight: 600;
-  color: var(--text-primary);
-}
-
-.close-btn {
-  background: transparent;
-  border: none;
-  font-size: 20px;
-  color: var(--text-muted);
-  cursor: pointer;
-  line-height: 1;
-}
-
-.close-btn:hover {
-  color: var(--text-secondary);
 }
 
 .dialog-body {

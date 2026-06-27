@@ -59,7 +59,7 @@ const businessTypeName = computed(() => {
 
 onMounted(() => {
   const id = route.params.id as string;
-  if (id === 'new') {
+  if (!id || id === 'new') {
     model.value = reimbursementStore.initNewDetail();
     // Default add one blank allocation line on load
     model.value.allocations = [
@@ -380,7 +380,7 @@ const confirmClose = () => {
     <ConfirmDialog 
       :show="showCloseConfirm"
       title="提示"
-      message="确认关闭当前页面吗？未保存的修改将会丢失。"
+      message="确认关闭？"
       type="warning"
       @confirm="confirmClose"
       @cancel="showCloseConfirm = false"
@@ -390,10 +390,10 @@ const confirmClose = () => {
     <ConfirmDialog 
       :show="showSubmitSuccess"
       title="提示"
-      message="提交成功！"
+      message="提交成功"
       type="success"
       :showCancel="false"
-      confirmText="确定"
+      confirmText="确认"
       @confirm="() => { showSubmitSuccess = false; router.push('/'); }"
     />
 

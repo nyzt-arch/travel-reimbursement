@@ -69,7 +69,7 @@ const confirmDelete = () => {
     <ConfirmDialog 
       :show="showConfirmDelete"
       title="提示"
-      message="确认清空备注信息吗？"
+      message="确认删除？"
       type="danger"
       @confirm="confirmDelete"
       @cancel="showConfirmDelete = false"

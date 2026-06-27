@@ -87,41 +87,41 @@ onUnmounted(() => {
               </div>
             </td>
           </tr>
-          
+
           <tr v-for="(item, idx) in items" :key="item.id">
             <td class="text-center font-mono">{{ idx + 1 }}</td>
-            
+
             <!-- Actions Column -->
             <td class="text-center">
               <div class="action-buttons">
                 <!-- Copy Icon -->
-                <button 
-                  class="action-btn" 
-                  title="复制报销单" 
+                <button
+                  class="action-btn"
+                  title="复制报销单"
                   @click="handleAction('copy', item)"
                 >
                   📋
                 </button>
                 <!-- Edit Icon -->
-                <button 
-                  class="action-btn" 
-                  title="编辑报销单" 
+                <button
+                  class="action-btn"
+                  title="编辑报销单"
                   @click="handleAction('edit', item)"
                 >
                   ✏️
                 </button>
                 <!-- More Actions Trigger -->
                 <div class="more-actions-wrapper">
-                  <button 
-                    class="action-btn more-btn" 
+                  <button
+                    class="action-btn more-btn"
                     title="更多操作"
                     @click="toggleMenu(item.id, $event)"
                   >
                     ⊙
                   </button>
                   <!-- Dropdown Menu -->
-                  <div 
-                    v-if="activeMenuId === item.id" 
+                  <div
+                    v-if="activeMenuId === item.id"
                     class="more-dropdown-menu"
                     @click.stop
                   >
@@ -133,15 +133,15 @@ onUnmounted(() => {
                     </button>
                     <hr class="menu-divider" />
                     <!-- Void action is only allowed for completed sheets -->
-                    <button 
-                      class="dropdown-item text-danger" 
+                    <button
+                      class="dropdown-item text-danger"
                       :disabled="item.status === 2"
                       @click="handleAction('void', item)"
                     >
                       🚫 作废
                     </button>
-                    <button 
-                      class="dropdown-item text-danger" 
+                    <button
+                      class="dropdown-item text-danger"
                       @click="handleAction('delete', item)"
                     >
                       🗑️ 删除
@@ -150,50 +150,50 @@ onUnmounted(() => {
                 </div>
               </div>
             </td>
-            
+
             <!-- No. link -->
             <td>
               <router-link :to="`/detail/${item.id}`" class="link-no">
                 {{ item.reimNo }}
               </router-link>
             </td>
-            
+
             <!-- Status Badge -->
             <td class="text-center">
               <span v-if="item.status === 0" class="badge badge-draft">草稿</span>
               <span v-else-if="item.status === 1" class="badge badge-completed">已完成</span>
               <span v-else-if="item.status === 2" class="badge badge-cancelled">已作废</span>
             </td>
-            
+
             <!-- Person -->
             <td>{{ baseDataStore.getEmployeeNameById(item.reimburserId) }}</td>
-            
+
             <!-- Dept -->
             <td>{{ baseDataStore.getDeptNameById(item.reimDepartmentId) }}</td>
-            
+
             <!-- Company -->
             <td>{{ baseDataStore.getCompanyNameById(item.reimCompanyId) }}</td>
-            
+
             <!-- Biz Type -->
             <td>{{ baseDataStore.getBusinessTypeNameById(item.businessTypeId) }}</td>
-            
+
             <!-- Title -->
             <td>
               <router-link :to="`/detail/${item.id}`" class="link-title" :title="item.title">
                 {{ item.title }}
               </router-link>
             </td>
-            
+
             <!-- Reason -->
             <td class="cell-reason" :title="item.reason">
               {{ item.reason }}
             </td>
-            
+
             <!-- Subsidy -->
             <td class="text-right font-mono font-bold amount-text">
               CNY {{ formatAmount(item.subsidyTotal) }}
             </td>
-            
+
             <!-- Date -->
             <td class="font-mono text-muted">{{ formatDate(item.createTime) }}</td>
           </tr>

@@ -373,7 +373,7 @@ const getRatioDisplay = (val: number) => {
     <ConfirmDialog 
       :show="showConfirmDelete"
       title="提示"
-      message="确认删除该费用分摊行吗？"
+      message="确定删除？"
       type="danger"
       @confirm="confirmDelete"
       @cancel="showConfirmDelete = false"
@@ -383,7 +383,7 @@ const getRatioDisplay = (val: number) => {
     <ConfirmDialog 
       :show="showMinRowAlert"
       title="提示"
-      message="至少保留一条分摊信息！"
+      message="至少保留一条分摊信息"
       type="warning"
       :showCancel="false"
       confirmText="确定"
