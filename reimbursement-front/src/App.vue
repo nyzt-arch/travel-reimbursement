@@ -4,20 +4,6 @@ import { RouterView } from 'vue-router';
 
 <template>
   <div class="app-wrapper">
-    <!-- Header -->
-    <header class="app-header">
-      <div class="header-container">
-        <div class="logo-area">
-          <span class="logo-icon">💼</span>
-          <span class="logo-title">企业差旅费用报销系统</span>
-        </div>
-        <div class="user-profile">
-          <span class="avatar">👤</span>
-          <span class="username">系统管理员</span>
-        </div>
-      </div>
-    </header>
-
     <!-- Main Content Frame -->
     <main class="app-main">
       <router-view />

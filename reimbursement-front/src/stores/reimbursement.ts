@@ -13,9 +13,9 @@ export const useReimbursementStore = defineStore('reimbursement', {
       {
         id: 'T001',
         reimId: 'R001',
-        travelerId: 'E001', // 徐年年
-        departCityNo: '110000', // 北京
-        arriveCityNo: '310000', // 上海
+        travelerId: '13AB3A3F72409002', // 徐年年
+        departCityNo: '10119', // 北京
+        arriveCityNo: '10621', // 上海
         departDate: '2026-06-20',
         arriveDate: '2026-06-24',
         tripDesc: '华东区大客户交付与部署服务'
@@ -25,14 +25,14 @@ export const useReimbursementStore = defineStore('reimbursement', {
     const mockCalendar1: SubsidyCalendar[] = [];
     const dates = ['2026-06-20', '2026-06-21', '2026-06-22', '2026-06-23', '2026-06-24'];
     const weekdays = ['星期六', '星期日', '星期一', '星期二', '星期三'];
-    
+
     dates.forEach((date, i) => {
       mockCalendar1.push({
         id: `C_M1_${i}`,
         subsidyInfoId: 'S001',
         subsidyDate: date,
         weekDay: weekdays[i] || '',
-        cityNo: '310000', // 上海 (一线) -> 餐100, 交40, 通40
+        cityNo: '10621', // 上海 (一线) -> 餐100, 交40, 通40
         mealChecked: 1,
         mealStandard: 100,
         mealAmount: 100,
@@ -50,11 +50,11 @@ export const useReimbursementStore = defineStore('reimbursement', {
         id: 'S001',
         reimId: 'R001',
         tripId: 'T001',
-        travelerId: 'E001',
+        travelerId: '13AB3A3F72409002',
         startDate: '2026-06-20',
         endDate: '2026-06-24',
         subsidyDays: 5,
-        subsidyCityNo: '310000',
+        subsidyCityNo: '10621',
         applyAmount: 900, // 5 * 180 = 900
         subsidyAmount: 900,
         calendars: mockCalendar1
@@ -65,8 +65,8 @@ export const useReimbursementStore = defineStore('reimbursement', {
       {
         id: 'A001',
         reimId: 'R001',
-        companyId: 'C002', // 上海分公司
-        projectId: 'P001', // 移动办公升级项目
+        companyId: '19218A262C976000', // 胜意科技上海分公司
+        projectId: '1C811ABF96195000', // 华中客户定制化项目
         allocRatio: 0.6,
         allocAmount: 540,
         sortOrder: 1
@@ -74,8 +74,8 @@ export const useReimbursementStore = defineStore('reimbursement', {
       {
         id: 'A002',
         reimId: 'R001',
-        companyId: 'C001', // 北京分公司
-        projectId: 'P002', // 研发提效工程
+        companyId: '1C54557F1782E000', // 胜意科技北京分公司
+        projectId: '1C5931735AC4A000', // 华南客户定制化项目
         allocRatio: 0.4,
         allocAmount: 360,
         sortOrder: 2
@@ -86,9 +86,9 @@ export const useReimbursementStore = defineStore('reimbursement', {
       {
         id: 'T002',
         reimId: 'R002',
-        travelerId: 'E002', // 张三
-        departCityNo: '420100', // 武汉
-        arriveCityNo: '110000', // 北京
+        travelerId: '13AB498CC6409002', // 郑雨雪
+        departCityNo: '10458', // 武汉
+        arriveCityNo: '10119', // 北京
         departDate: '2026-06-25',
         arriveDate: '2026-06-29',
         tripDesc: '华中地区日常技术支持与外部会议对接'
@@ -98,14 +98,14 @@ export const useReimbursementStore = defineStore('reimbursement', {
     const mockCalendar2: SubsidyCalendar[] = [];
     const dates2 = ['2026-06-25', '2026-06-26', '2026-06-27', '2026-06-28', '2026-06-29'];
     const weekdays2 = ['星期四', '星期五', '星期六', '星期日', '星期一'];
-    
+
     dates2.forEach((date, i) => {
       mockCalendar2.push({
         id: `C_M2_${i}`,
         subsidyInfoId: 'S002',
         subsidyDate: date,
         weekDay: weekdays2[i] || '',
-        cityNo: '110000', // 北京 (一线) -> 餐100, 交40, 通40
+        cityNo: '10119', // 北京 (一线) -> 餐100, 交40, 通40
         mealChecked: 1,
         mealStandard: 100,
         mealAmount: 100,
@@ -123,11 +123,11 @@ export const useReimbursementStore = defineStore('reimbursement', {
         id: 'S002',
         reimId: 'R002',
         tripId: 'T002',
-        travelerId: 'E002',
+        travelerId: '13AB498CC6409002',
         startDate: '2026-06-25',
         endDate: '2026-06-29',
         subsidyDays: 5,
-        subsidyCityNo: '110000',
+        subsidyCityNo: '10119',
         applyAmount: 900,
         subsidyAmount: 900,
         calendars: mockCalendar2
@@ -141,10 +141,10 @@ export const useReimbursementStore = defineStore('reimbursement', {
           reimNo: 'RCBX20260620001',
           title: '徐年年2026年6月上海客户部署差旅报销',
           reason: '前往上海分公司协助大客户完成系统版本升级与定制化模块部署。',
-          reimburserId: 'E001',
-          reimDepartmentId: 'D001',
-          reimCompanyId: 'C002',
-          businessTypeId: 'B0010101', // 项目出差
+          reimburserId: '13AB3A3F72409002',
+          reimDepartmentId: '13AB8D7B52A9B002',
+          reimCompanyId: '19218A262C976000',
+          businessTypeId: '1B5FEB7DD4396000', // 项目出差
           subsidyTotal: 900,
           mealSubsidyTotal: 500,
           transportSubsidyTotal: 200,
@@ -160,12 +160,12 @@ export const useReimbursementStore = defineStore('reimbursement', {
         {
           id: 'R002',
           reimNo: 'RCBX20260625001',
-          title: '张三日常办公与外部技术支持差旅（草稿）',
+          title: '郑雨雪日常办公与外部技术支持差旅（草稿）',
           reason: '华中地区日常技术支持以及与当地服务商进行会议对接。',
-          reimburserId: 'E002',
-          reimDepartmentId: 'D002',
-          reimCompanyId: 'C003', // 武汉分公司
-          businessTypeId: 'B0010102', // 日常出差
+          reimburserId: '13AB498CC6409002',
+          reimDepartmentId: '13BFD31C6029A002',
+          reimCompanyId: '1C61686865DA8000', // 胜意科技武汉分公司
+          businessTypeId: '1A92E43082EFC000', // 市场拓展出差
           subsidyTotal: 900,
           mealSubsidyTotal: 500,
           transportSubsidyTotal: 200,
@@ -180,8 +180,8 @@ export const useReimbursementStore = defineStore('reimbursement', {
             {
               id: 'A003',
               reimId: 'R002',
-              companyId: 'C003',
-              projectId: 'P002',
+              companyId: '1C61686865DA8000',
+              projectId: '1C5931735AC4A000', // 华南客户定制化项目
               allocRatio: 1.0,
               allocAmount: 900,
               sortOrder: 1
@@ -189,11 +189,11 @@ export const useReimbursementStore = defineStore('reimbursement', {
           ]
         }
       ] as Reimbursement[],
-      
+
       currentDetail: null as Reimbursement | null
     };
   },
-  
+
   actions: {
     // Read list with search queries (simulated pagination & filters)
     getReimbursementList(filters: {
@@ -256,10 +256,10 @@ export const useReimbursementStore = defineStore('reimbursement', {
     // Save Draft
     saveDraft(data: Reimbursement) {
       const idx = this.reimbursements.findIndex(r => r.id === data.id);
-      
+
       const toSave = JSON.parse(JSON.stringify(data)) as Reimbursement;
       toSave.updateTime = new Date().toISOString().replace('T', ' ').substring(0, 19);
-      
+
       if (idx !== -1) {
         // Update existing draft
         this.reimbursements[idx] = toSave;
@@ -274,11 +274,11 @@ export const useReimbursementStore = defineStore('reimbursement', {
     // Submit Sheet (flips status to 1)
     submitSheet(data: Reimbursement) {
       const idx = this.reimbursements.findIndex(r => r.id === data.id);
-      
+
       const toSave = JSON.parse(JSON.stringify(data)) as Reimbursement;
       toSave.status = 1; // 已完成
       toSave.updateTime = new Date().toISOString().replace('T', ' ').substring(0, 19);
-      
+
       if (idx !== -1) {
         this.reimbursements[idx] = toSave;
       } else {
@@ -313,19 +313,19 @@ export const useReimbursementStore = defineStore('reimbursement', {
         copy.status = 0; // copy is always draft
         copy.createTime = new Date().toISOString().replace('T', ' ').substring(0, 19);
         copy.updateTime = copy.createTime;
-        
+
         // update IDs of linked records to avoid duplicates
         copy.trips?.forEach((t, i) => { t.id = `T_COPY_${Date.now()}_${i}`; t.reimId = copy.id; });
-        copy.subsidies?.forEach((s, i) => { 
-          s.id = `S_COPY_${Date.now()}_${i}`; 
-          s.reimId = copy.id; 
+        copy.subsidies?.forEach((s, i) => {
+          s.id = `S_COPY_${Date.now()}_${i}`;
+          s.reimId = copy.id;
           s.calendars?.forEach((c, j) => {
             c.id = `C_COPY_${Date.now()}_${i}_${j}`;
             c.subsidyInfoId = s.id;
           });
         });
         copy.allocations?.forEach((a, i) => { a.id = `A_COPY_${Date.now()}_${i}`; a.reimId = copy.id; });
-        
+
         this.reimbursements.push(copy);
       }
     }

@@ -49,3 +49,7 @@ out/
 .gradle/
 build/
 
+# Documents
+*.docx
+*.doc
+
