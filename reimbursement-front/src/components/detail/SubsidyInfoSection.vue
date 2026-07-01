@@ -18,6 +18,10 @@ const props = defineProps({
   businessTypeName: {
     type: String,
     default: ''
+  },
+  isReadOnly: {
+    type: Boolean,
+    default: false
   }
 });
 
@@ -80,7 +84,7 @@ const handleSaveCalendar = (newCalendars: SubsidyCalendar[], totalActual: number
     >
       <template #summary>
         <span class="header-summary-val font-mono">
-          CNY {{ headerSummaryStr }}
+          {{ headerSummaryStr }}
         </span>
       </template>
     </SectionHeader>
@@ -105,7 +109,7 @@ const handleSaveCalendar = (newCalendars: SubsidyCalendar[], totalActual: number
                 <th style="width: 60px;" class="text-center">序号</th>
                 <th style="width: 140px;">出行人</th>
                 <th style="width: 220px;">出差日期</th>
-                <th style="width: 100px;" class="text-center">补助天s</th>
+                <th style="width: 100px;" class="text-center">补助天数</th>
                 <th style="width: 160px;">行程</th>
                 <th style="width: 120px;">补助城市</th>
                 <th style="width: 120px;" class="text-right">申请金额</th>
@@ -131,17 +135,17 @@ const handleSaveCalendar = (newCalendars: SubsidyCalendar[], totalActual: number
                 <td>
                   <span class="city-tag">📍 {{ baseDataStore.getCityNameByNo(sub.subsidyCityNo) }}</span>
                 </td>
-                <td class="text-right font-mono">CNY {{ formatAmount(sub.applyAmount) }}</td>
+                <td class="text-right font-mono">{{ formatAmount(sub.applyAmount) }}</td>
                 <td class="text-right font-mono font-bold primary-text">
-                  CNY {{ formatAmount(sub.subsidyAmount) }}
+                  {{ formatAmount(sub.subsidyAmount) }}
                 </td>
                 <td class="text-center">
                   <button 
                     class="edit-icon-btn" 
-                    title="编辑补助日历" 
+                    :title="isReadOnly ? '查看补助日历' : '编辑补助日历'" 
                     @click="handleEditSubsidy(sub)"
                   >
-                    ✏️
+                    {{ isReadOnly ? '👁️' : '✏️' }}
                   </button>
                 </td>
               </tr>
@@ -151,15 +155,16 @@ const handleSaveCalendar = (newCalendars: SubsidyCalendar[], totalActual: number
       </div>
     </transition>
 
-    <!-- Subsidy Calendar Grid modal -->
-    <SubsidyCalendarDialog 
-      :show="showDialog"
-      :subsidy="activeSubsidy"
-      :trip="activeTrip"
-      :business-type-name="businessTypeName"
-      @save="handleSaveCalendar"
-      @cancel="showDialog = false"
-    />
+     <!-- Subsidy Calendar Grid modal -->
+     <SubsidyCalendarDialog 
+       :show="showDialog"
+       :subsidy="activeSubsidy"
+       :trip="activeTrip"
+       :business-type-name="businessTypeName"
+       :isReadOnly="isReadOnly"
+       @save="handleSaveCalendar"
+       @cancel="showDialog = false"
+     />
   </div>
 </template>
 

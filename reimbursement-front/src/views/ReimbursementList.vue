@@ -1,12 +1,20 @@
+//将原先在前端内存里利用计算属性（filteredItems、pagedItems）
+//对静态 Mock 列表进行过滤和分页的纯本地逻辑，重构为基于后端交互的机制。
+//在页面挂载时首先并发加载字典数据和报销单列表，
+//并在每次页码、每页记录数或搜索条件发生改变时
+//自动触发 Axios 请求从数据库拉取最新的单据分页数据。
+
 <script setup lang="ts">
-import { ref, computed, reactive } from 'vue';
+import { ref, reactive, onMounted, watch } from 'vue'; // 引入 onMounted 和 watch
 import { useReimbursementStore } from '../stores/reimbursement';
+import { useBaseDataStore } from '../stores/baseData'; // 引入 baseData 以拉取下拉项
 import SearchBar from '../components/SearchBar.vue';
 import DataTable from '../components/DataTable.vue';
 import Pagination from '../components/Pagination.vue';
 import ConfirmDialog from '../components/ConfirmDialog.vue';
 
 const reimbursementStore = useReimbursementStore();
+const baseDataStore = useBaseDataStore();
 
 // Search state
 const searchFilters = reactive({
@@ -23,37 +31,68 @@ const searchFilters = reactive({
 const currentPage = ref(1);
 const pageSize = ref(10);
 
-// Filtered list
-const filteredItems = computed(() => {
-  return reimbursementStore.getReimbursementList(searchFilters);
+// 查询接口方法调用
+const fetchList = () => {
+  reimbursementStore.fetchList({
+    ...searchFilters,
+    pageNum: currentPage.value,
+    pageSize: pageSize.value
+  });
+};
+
+// 页面加载时拉取基础主数据及单据列表
+onMounted(async () => {
+  await baseDataStore.loadAllBaseData();
+  fetchList();
 });
 
-// Paged list
-const pagedItems = computed(() => {
-  const start = (currentPage.value - 1) * pageSize.value;
-  const end = start + pageSize.value;
-  return filteredItems.value.slice(start, end);
+// 监听页码和页大小变化，重新查询后端
+watch([currentPage, pageSize], () => {
+  fetchList();
 });
 
 const handleSearch = (newFilters: Partial<typeof searchFilters>) => {
   Object.assign(searchFilters, newFilters);
-  currentPage.value = 1; // Reset to page 1
+  currentPage.value = 1; // 重置到第一页
+  fetchList();
 };
 
 const handleReset = (clearedFilters: Partial<typeof searchFilters>) => {
   Object.assign(searchFilters, clearedFilters);
   currentPage.value = 1;
+  fetchList();
 };
 
 // Dialog state
 const showDeleteDialog = ref(false);
 const itemToDeleteId = ref<string | null>(null);
 
-const showPushDialog = ref(false);
-const pushDialogMsg = ref('');
 
-const handleCopy = (id: string) => {
-  reimbursementStore.copyReimbursement(id);
+
+const isActionPending = ref(false);
+
+const handleCopy = async (id: string) => {
+  if (isActionPending.value) return;
+  isActionPending.value = true;
+  try {
+    // 复制功能：先加载详情，重命名并生成新ID然后保存到后端
+    const detail = await reimbursementStore.loadDetail(id);
+    if (detail) {
+      const copyDetail = {
+        ...detail,
+        id: `COPY_${Date.now()}`,
+        reimNo: '',
+        title: (detail.title || '').trim().endsWith('(复制)') ? detail.title : `${detail.title || ''} (复制)`,
+        status: 0,
+        createTime: '',
+        updateTime: ''
+      };
+      await reimbursementStore.saveDraft(copyDetail);
+      await fetchList(); // 刷新列表
+    }
+  } finally {
+    isActionPending.value = false;
+  }
 };
 
 const handleDeleteClick = (id: string) => {
@@ -61,10 +100,17 @@ const handleDeleteClick = (id: string) => {
   showDeleteDialog.value = true;
 };
 
-const confirmDelete = () => {
-  if (itemToDeleteId.value) {
-    reimbursementStore.deleteReimbursement(itemToDeleteId.value);
-    itemToDeleteId.value = null;
+const confirmDelete = async () => {
+  if (isActionPending.value) return;
+  isActionPending.value = true;
+  try {
+    if (itemToDeleteId.value) {
+      await reimbursementStore.deleteReimbursement(itemToDeleteId.value);
+      itemToDeleteId.value = null;
+      await fetchList(); // 刷新
+    }
+  } finally {
+    isActionPending.value = false;
   }
   showDeleteDialog.value = false;
 };
@@ -74,17 +120,18 @@ const cancelDelete = () => {
   showDeleteDialog.value = false;
 };
 
-const handleVoid = (id: string) => {
-  reimbursementStore.voidReimbursement(id);
-};
-
-const handlePush = (id: string) => {
-  const item = reimbursementStore.reimbursements.find(r => r.id === id);
-  if (item) {
-    pushDialogMsg.value = `报销单号为 [${item.reimNo}] 的报销单已成功手工推送至财务核算系统！`;
-    showPushDialog.value = true;
+const handleVoid = async (id: string) => {
+  if (isActionPending.value) return;
+  isActionPending.value = true;
+  try {
+    await reimbursementStore.voidReimbursement(id);
+    await fetchList(); // 刷新
+  } finally {
+    isActionPending.value = false;
   }
 };
+
+
 </script>
 
 <template>
@@ -93,23 +140,23 @@ const handlePush = (id: string) => {
     <SearchBar @search="handleSearch" @reset="handleReset" />
 
     <!-- Table List Grid -->
-    <DataTable 
-      :items="pagedItems" 
+    <DataTable
+      :items="reimbursementStore.reimbursements"
+      :loading="isActionPending"
       @copy="handleCopy"
       @delete="handleDeleteClick"
       @void="handleVoid"
-      @push="handlePush"
     />
 
     <!-- Bottom Pagination -->
-    <Pagination 
+    <Pagination
       v-model:currentPage="currentPage"
       v-model:pageSize="pageSize"
-      :total="filteredItems.length"
+      :total="reimbursementStore.total"
     />
 
     <!-- Confirm deletion dialog -->
-    <ConfirmDialog 
+    <ConfirmDialog
       :show="showDeleteDialog"
       title="提示"
       message="确认删除该报销单吗？删除后数据不可恢复。"
@@ -118,22 +165,12 @@ const handlePush = (id: string) => {
       @cancel="cancelDelete"
     />
 
-    <!-- Push success notification -->
-    <ConfirmDialog
-      :show="showPushDialog"
-      title="手工推送结果"
-      :message="pushDialogMsg"
-      type="success"
-      :showCancel="false"
-      confirmText="好"
-      @confirm="showPushDialog = false"
-    />
+
   </div>
 </template>
 
 <style scoped>
-.list-page-container {
-  display: flex;
-  flex-direction: column;
+.list-page-container.container {
+  max-width: 96%; /* 将当前页面容器的最大宽度改大（可设为百分比或如 1600px） */
 }
 </style>

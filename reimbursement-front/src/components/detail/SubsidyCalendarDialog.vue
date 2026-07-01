@@ -20,6 +20,10 @@ const props = defineProps({
   businessTypeName: {
     type: String,
     default: ''
+  },
+  isReadOnly: {
+    type: Boolean,
+    default: false
   }
 });
 
@@ -236,20 +240,20 @@ const handleConfirm = () => {
             <div class="totals-panel">
               <div class="total-row">
                 <span class="total-label">标准总金额</span>
-                <span class="total-val font-mono">CNY {{ formatAmount(standardTotal) }}</span>
+                <span class="total-val font-mono">{{ formatAmount(standardTotal) }}</span>
               </div>
               <div class="total-row highlight-row">
                 <span class="total-label">补助总金额</span>
-                <span class="total-val font-mono">CNY {{ formatAmount(actualTotal) }}</span>
+                <span class="total-val font-mono">{{ formatAmount(actualTotal) }}</span>
               </div>
             </div>
           </div>
 
           <!-- Right side matrix checklist table -->
           <div class="right-pane">
-            <div class="table-actions">
+            <div v-if="!isReadOnly" class="table-actions">
               <label class="all-select-checkbox">
-                <input type="checkbox" v-model="isAllChecked" />
+                <input type="checkbox" v-model="isAllChecked" :disabled="isReadOnly" />
                 <span>全选 / 取消全选</span>
               </label>
             </div>
@@ -262,19 +266,19 @@ const handleConfirm = () => {
                     <th style="width: 100px;" class="text-center">补助城市</th>
                     <th style="width: 140px;">
                       <div class="header-checkbox-cell">
-                        <input type="checkbox" v-model="isMealColChecked" />
+                        <input type="checkbox" v-model="isMealColChecked" :disabled="isReadOnly" />
                         <span>餐费补助</span>
                       </div>
                     </th>
                     <th style="width: 140px;">
                       <div class="header-checkbox-cell">
-                        <input type="checkbox" v-model="isTransportColChecked" />
+                        <input type="checkbox" v-model="isTransportColChecked" :disabled="isReadOnly" />
                         <span>交通补助</span>
                       </div>
                     </th>
                     <th style="width: 140px;">
                       <div class="header-checkbox-cell">
-                        <input type="checkbox" v-model="isCommColChecked" />
+                        <input type="checkbox" v-model="isCommColChecked" :disabled="isReadOnly" />
                         <span>通讯补助</span>
                       </div>
                     </th>
@@ -288,6 +292,7 @@ const handleConfirm = () => {
                         <input 
                           type="checkbox" 
                           :checked="isRowChecked(day)"
+                          :disabled="isReadOnly"
                           @change="handleRowToggle(day, $event)"
                         />
                         <div class="date-text">
@@ -308,6 +313,7 @@ const handleConfirm = () => {
                         <input 
                           type="checkbox" 
                           :checked="day.mealChecked === 1"
+                          :disabled="isReadOnly"
                           @change="handleCellToggle('meal', day)"
                         />
                         <div class="amount-inputs">
@@ -315,7 +321,7 @@ const handleConfirm = () => {
                           <input 
                             type="number" 
                             v-model.number="day.mealAmount"
-                            :disabled="day.mealChecked === 0"
+                            :disabled="day.mealChecked === 0 || isReadOnly"
                             min="0"
                             :max="day.mealStandard"
                             @blur="validateAmountInput('meal', day)"
@@ -330,6 +336,7 @@ const handleConfirm = () => {
                         <input 
                           type="checkbox" 
                           :checked="day.transportChecked === 1"
+                          :disabled="isReadOnly"
                           @change="handleCellToggle('transport', day)"
                         />
                         <div class="amount-inputs">
@@ -337,7 +344,7 @@ const handleConfirm = () => {
                           <input 
                             type="number" 
                             v-model.number="day.transportAmount"
-                            :disabled="day.transportChecked === 0"
+                            :disabled="day.transportChecked === 0 || isReadOnly"
                             min="0"
                             :max="day.transportStandard"
                             @blur="validateAmountInput('transport', day)"
@@ -352,6 +359,7 @@ const handleConfirm = () => {
                         <input 
                           type="checkbox" 
                           :checked="day.commChecked === 1"
+                          :disabled="isReadOnly"
                           @change="handleCellToggle('comm', day)"
                         />
                         <div class="amount-inputs">
@@ -359,7 +367,7 @@ const handleConfirm = () => {
                           <input 
                             type="number" 
                             v-model.number="day.commAmount"
-                            :disabled="day.commChecked === 0"
+                            :disabled="day.commChecked === 0 || isReadOnly"
                             min="0"
                             :max="day.commStandard"
                             @blur="validateAmountInput('comm', day)"
@@ -376,8 +384,10 @@ const handleConfirm = () => {
 
         <!-- Footer -->
         <div class="dialog-footer">
-          <button class="btn btn-secondary" @click="emit('cancel')">取消</button>
-          <button class="btn btn-primary" @click="handleConfirm">确认</button>
+          <button class="btn btn-secondary" @click="emit('cancel')">
+            {{ isReadOnly ? '关闭' : '取消' }}
+          </button>
+          <button v-if="!isReadOnly" class="btn btn-primary" @click="handleConfirm">确认</button>
         </div>
       </div>
     </div>

@@ -1,7 +1,27 @@
-// 作用：存放获取系统下拉项所需的所有公共元数据接口。包含以下 API 函数的定义：
-// 获取费用归属公司列表 (GET /api/base/companies)
-// 获取报销部门列表 (GET /api/base/departments)
-// 获取报销人/员工列表 (GET /api/base/employees)
-// 获取三级业务类型树 (GET /api/base/businessTypes)
-// 获取报销城市列表 (GET /api/base/cities)
-// 获取分摊归属项目列表 (GET /api/base/projects)
+//修改原因：将获取各个静态主数据的网络请求封装为函数，供 Pinia 状态管理库调用。
+import request from './request';
+import type { Company, Department, Employee, City, Project, BusinessType } from '../types';
+
+export function getCompanies(): Promise<Company[]> {
+  return request.get('/base_data/companies');
+}
+
+export function getDepartments(): Promise<Department[]> {
+  return request.get('/base_data/departments');
+}
+
+export function getEmployees(): Promise<Employee[]> {
+  return request.get('/base_data/employees');
+}
+
+export function getBusinessTypes(): Promise<BusinessType[]> {
+  return request.get('/base_data/businessTypes');
+}
+
+export function getCities(): Promise<City[]> {
+  return request.get('/base_data/cities');
+}
+
+export function getProjects(): Promise<Project[]> {
+  return request.get('/base_data/projects');
+}

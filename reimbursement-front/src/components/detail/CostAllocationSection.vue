@@ -14,6 +14,10 @@ const props = defineProps({
   collapsed: {
     type: Boolean,
     required: true
+  },
+  isReadOnly: {
+    type: Boolean,
+    default: false
   }
 });
 
@@ -252,7 +256,7 @@ const getRatioDisplay = (val: number) => {
     >
       <template #summary>
         <span class="header-summary-val font-mono">
-          （分摊金额: CNY {{ formatAmount(model.subsidyTotal) }}）
+          （分摊金额: {{ formatAmount(model.subsidyTotal) }}）
         </span>
       </template>
     </SectionHeader>
@@ -269,17 +273,17 @@ const getRatioDisplay = (val: number) => {
                 <th style="width: 180px;" class="text-right">
                   <div class="header-split-btn">
                     <span>分摊比例 % *</span>
-                    <button class="split-btn" @click.stop="handleEqualSplit">⟳ 均摊</button>
+                    <button v-if="!isReadOnly" class="split-btn" @click.stop="handleEqualSplit">⟳ 均摊</button>
                   </div>
                 </th>
                 <th style="width: 180px;" class="text-right">分摊金额 *</th>
-                <th style="width: 80px;" class="text-center">操作</th>
+                <th v-if="!isReadOnly" style="width: 80px;" class="text-center">操作</th>
               </tr>
             </thead>
             <tbody>
               <tr v-if="!model.allocations || model.allocations.length === 0">
-                <td colspan="6" class="empty-cell">
-                  暂无分摊比例数据，请点击下方进行“添加一行”
+                <td :colspan="isReadOnly ? 5 : 6" class="empty-cell">
+                  暂无分摊比例数据{{ isReadOnly ? '' : '，请点击下方进行“添加一行”' }}
                 </td>
               </tr>
               <tr v-for="(alloc, idx) in model.allocations" :key="alloc.id">
@@ -287,7 +291,7 @@ const getRatioDisplay = (val: number) => {
                 
                 <!-- Company select -->
                 <td>
-                  <select v-model="alloc.companyId">
+                  <select v-model="alloc.companyId" :disabled="isReadOnly">
                     <option value="">请选择费用归属公司</option>
                     <option v-for="c in baseDataStore.companies" :key="c.id" :value="c.id">
                       {{ c.name }}
@@ -297,7 +301,7 @@ const getRatioDisplay = (val: number) => {
                 
                 <!-- Project select -->
                 <td>
-                  <select v-model="alloc.projectId">
+                  <select v-model="alloc.projectId" :disabled="isReadOnly">
                     <option value="">请选择归属项目（选填）</option>
                     <option v-for="p in baseDataStore.projects" :key="p.id" :value="p.id">
                       {{ p.name }}
@@ -311,7 +315,7 @@ const getRatioDisplay = (val: number) => {
                     <input 
                       type="number" 
                       :value="getRatioDisplay(alloc.allocRatio)"
-                      :disabled="Number(idx) === 0"
+                      :disabled="Number(idx) === 0 || isReadOnly"
                       class="text-right font-mono"
                       step="0.01"
                       min="0"
@@ -327,7 +331,7 @@ const getRatioDisplay = (val: number) => {
                   <input 
                     type="number" 
                     :value="alloc.allocAmount.toFixed(2)"
-                    :disabled="Number(idx) === 0"
+                    :disabled="Number(idx) === 0 || isReadOnly"
                     class="text-right font-mono"
                     step="0.01"
                     min="0"
@@ -336,7 +340,7 @@ const getRatioDisplay = (val: number) => {
                 </td>
                 
                 <!-- Delete row action -->
-                <td class="text-center">
+                <td v-if="!isReadOnly" class="text-center">
                   <button 
                     class="delete-icon-btn" 
                     title="删除该行" 
@@ -354,16 +358,16 @@ const getRatioDisplay = (val: number) => {
                   {{ (model.allocations.reduce((sum: number, a: CostAllocation) => sum + a.allocRatio, 0) * 100).toFixed(2) }}%
                 </td>
                 <td class="text-right font-mono font-bold orange-text">
-                  CNY {{ formatAmount(model.allocations.reduce((sum: number, a: CostAllocation) => sum + a.allocAmount, 0)) }}
+                  {{ formatAmount(model.allocations.reduce((sum: number, a: CostAllocation) => sum + a.allocAmount, 0)) }}
                 </td>
-                <td></td>
+                <td v-if="!isReadOnly"></td>
               </tr>
             </tbody>
           </table>
         </div>
 
         <!-- Add Row Link -->
-        <button class="add-row-btn" @click="handleAddRow">
+        <button v-if="!isReadOnly" class="add-row-btn" @click="handleAddRow">
           ⊕ 添加一行
         </button>
       </div>

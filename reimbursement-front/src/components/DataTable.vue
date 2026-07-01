@@ -5,20 +5,30 @@ import type { Reimbursement } from '../types';
 import { useBaseDataStore } from '../stores/baseData';
 import { formatAmount, formatDate } from '../utils/formatter';
 
-defineProps({
+const props = defineProps({
   items: {
     type: Array as () => Reimbursement[],
     required: true
+  },
+  loading: {
+    type: Boolean,
+    default: false
   }
 });
 
-const emit = defineEmits(['copy', 'edit', 'delete', 'void', 'push']);
+const emit = defineEmits(['copy', 'edit', 'delete', 'void']);
 
 const router = useRouter();
 const baseDataStore = useBaseDataStore();
 
 // Track which row has its "more dropdown" open
 const activeMenuId = ref<string | null>(null);
+const menuStyle = ref({ top: '0px', left: '0px' });
+
+const getActiveItem = (): Reimbursement | null => {
+  if (activeMenuId.value === null) return null;
+  return props.items.find(item => item.id === activeMenuId.value) || null;
+};
 
 const toggleMenu = (id: string, event: Event) => {
   event.stopPropagation();
@@ -26,6 +36,12 @@ const toggleMenu = (id: string, event: Event) => {
     activeMenuId.value = null;
   } else {
     activeMenuId.value = id;
+    const target = event.currentTarget as HTMLElement;
+    const rect = target.getBoundingClientRect();
+    menuStyle.value = {
+      top: `${rect.bottom + window.scrollY + 6}px`,
+      left: `${rect.left + window.scrollX}px`
+    };
   }
 };
 
@@ -33,9 +49,12 @@ const closeMenu = () => {
   activeMenuId.value = null;
 };
 
-const handleAction = (action: string, item: Reimbursement) => {
+const handleAction = (action: string, item: Reimbursement | null) => {
+  if (!item) return;
   closeMenu();
-  if (action === 'copy') {
+  if (action === 'view') {
+    router.push({ path: `/detail/${item.id}`, query: { mode: 'view' } });
+  } else if (action === 'copy') {
     emit('copy', item.id);
   } else if (action === 'edit') {
     router.push(`/detail/${item.id}`);
@@ -43,8 +62,6 @@ const handleAction = (action: string, item: Reimbursement) => {
     emit('delete', item.id);
   } else if (action === 'void') {
     emit('void', item.id);
-  } else if (action === 'push') {
-    emit('push', item.id);
   }
 };
 
@@ -64,23 +81,24 @@ onUnmounted(() => {
       <table class="data-table">
         <thead>
           <tr>
-            <th style="width: 50px;" class="text-center">序号</th>
-            <th style="width: 100px;" class="text-center">操作</th>
-            <th style="width: 140px;">报销单号</th>
-            <th style="width: 100px;" class="text-center">单据状态</th>
-            <th style="width: 140px;">报销人</th>
-            <th style="width: 160px;">报销部门</th>
-            <th style="width: 140px;">费用归属公司</th>
-            <th style="width: 120px;">业务类型</th>
-            <th style="width: 200px;">报销标题</th>
-            <th style="width: 200px;">报销事由</th>
-            <th style="width: 110px;" class="text-right">补助金额</th>
-            <th style="width: 110px;">创建时间</th>
+            <th style="width: 40px;" class="text-center">序号</th>
+            <th style="width: 80px;" class="text-center">操作</th>
+            <th style="width: 115px;">报销单号</th>
+            <th style="width: 75px;" class="text-center border-right-divider">单据状态</th>
+            <th style="width: 85px;" class="text-center">单据类型</th>
+            <th style="width: 105px;">报销人</th>
+            <th style="width: 120px;">报销部门</th>
+            <th style="width: 125px;">费用归属公司</th>
+            <th style="width: 95px;">业务类型</th>
+            <th style="width: 120px;">报销标题</th>
+            <th style="width: 120px;">报销事由</th>
+            <th style="width: 90px;" class="text-right">补助金额</th>
+            <th style="width: 90px;">创建时间</th>
           </tr>
         </thead>
         <tbody>
           <tr v-if="items.length === 0">
-            <td colspan="12" class="empty-cell">
+            <td colspan="13" class="empty-cell">
               <div class="empty-state">
                 <span class="empty-icon">🗂️</span>
                 <span class="empty-text">暂无报销单数据</span>
@@ -94,18 +112,20 @@ onUnmounted(() => {
             <!-- Actions Column -->
             <td class="text-center">
               <div class="action-buttons">
-                <!-- Copy Icon -->
+                <!-- View Icon -->
                 <button
                   class="action-btn"
-                  title="复制报销单"
-                  @click="handleAction('copy', item)"
+                  title="查看报销单"
+                  :disabled="loading"
+                  @click="handleAction('view', item)"
                 >
-                  📋
+                  📄
                 </button>
                 <!-- Edit Icon -->
                 <button
                   class="action-btn"
-                  title="编辑报销单"
+                  :title="item.status === 2 ? '已作废单据不可编辑' : '编辑报销单'"
+                  :disabled="loading || item.status === 2"
                   @click="handleAction('edit', item)"
                 >
                   ✏️
@@ -115,38 +135,11 @@ onUnmounted(() => {
                   <button
                     class="action-btn more-btn"
                     title="更多操作"
+                    :disabled="loading"
                     @click="toggleMenu(item.id, $event)"
                   >
                     ⊙
                   </button>
-                  <!-- Dropdown Menu -->
-                  <div
-                    v-if="activeMenuId === item.id"
-                    class="more-dropdown-menu"
-                    @click.stop
-                  >
-                    <button class="dropdown-item" @click="handleAction('push', item)">
-                      🚀 手工推送
-                    </button>
-                    <button class="dropdown-item" @click="handleAction('copy', item)">
-                      📋 复制
-                    </button>
-                    <hr class="menu-divider" />
-                    <!-- Void action is only allowed for completed sheets -->
-                    <button
-                      class="dropdown-item text-danger"
-                      :disabled="item.status === 2"
-                      @click="handleAction('void', item)"
-                    >
-                      🚫 作废
-                    </button>
-                    <button
-                      class="dropdown-item text-danger"
-                      @click="handleAction('delete', item)"
-                    >
-                      🗑️ 删除
-                    </button>
-                  </div>
                 </div>
               </div>
             </td>
@@ -159,11 +152,14 @@ onUnmounted(() => {
             </td>
 
             <!-- Status Badge -->
-            <td class="text-center">
+            <td class="text-center border-right-divider">
               <span v-if="item.status === 0" class="badge badge-draft">草稿</span>
               <span v-else-if="item.status === 1" class="badge badge-completed">已完成</span>
               <span v-else-if="item.status === 2" class="badge badge-cancelled">已作废</span>
             </td>
+
+            <!-- Document Type -->
+            <td class="text-center">日常报销单</td>
 
             <!-- Person -->
             <td>{{ baseDataStore.getEmployeeNameById(item.reimburserId) }}</td>
@@ -191,7 +187,7 @@ onUnmounted(() => {
 
             <!-- Subsidy -->
             <td class="text-right font-mono font-bold amount-text">
-              CNY {{ formatAmount(item.subsidyTotal) }}
+              {{ formatAmount(item.subsidyTotal) }}
             </td>
 
             <!-- Date -->
@@ -201,6 +197,34 @@ onUnmounted(() => {
       </table>
     </div>
   </div>
+
+  <teleport to="body">
+    <div
+      v-if="activeMenuId !== null"
+      class="more-dropdown-menu body-teleported-menu"
+      :style="menuStyle"
+      @click.stop
+    >
+      <button
+        class="dropdown-item" @click="handleAction('copy', getActiveItem())">
+        📋 复制
+      </button>
+      <!-- Void action is only allowed for completed sheets -->
+      <button
+        class="dropdown-item text-danger"
+        :disabled="getActiveItem()?.status === 2"
+        @click="handleAction('void', getActiveItem())"
+      >
+        🚫 作废
+      </button>
+      <button
+        class="dropdown-item text-danger"
+        @click="handleAction('delete', getActiveItem())"
+      >
+        🗑️ 删除
+      </button>
+    </div>
+  </teleport>
 </template>
 
 <style scoped>
@@ -259,6 +283,12 @@ onUnmounted(() => {
 .action-btn:hover {
   background-color: var(--gray-100);
   border-color: var(--gray-300);
+}
+
+.action-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  background-color: var(--gray-100);
 }
 
 .more-btn {
@@ -335,19 +365,25 @@ onUnmounted(() => {
 }
 
 .link-title {
-  color: var(--text-primary);
+  color: var(--primary-color);
   font-weight: 500;
+  display: block;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 120px;
+  text-decoration: none;
 }
 
 .link-title:hover {
-  color: var(--primary-color);
+  text-decoration: underline;
 }
 
 .cell-reason {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  max-width: 200px;
+  max-width: 120px;
   color: var(--text-secondary);
 }
 
@@ -361,5 +397,51 @@ onUnmounted(() => {
 
 .font-bold {
   font-weight: 600;
+}
+
+.border-right-divider {
+  border-right: 1px solid var(--gray-200);
+}
+
+:global(.body-teleported-menu) {
+  position: absolute;
+  background-color: var(--bg-card);
+  border: 1px solid var(--gray-200);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-lg);
+  z-index: 9999;
+  padding: 4px 0;
+  width: 120px;
+  text-align: left;
+  box-sizing: border-box;
+}
+
+:global(.body-teleported-menu .dropdown-item) {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  padding: 8px 12px;
+  background: transparent;
+  border: none;
+  font-size: 13px;
+  color: var(--text-primary);
+  cursor: pointer;
+  text-align: left;
+  transition: var(--transition-fast);
+}
+
+:global(.body-teleported-menu .dropdown-item:hover:not(:disabled)) {
+  background-color: var(--gray-50);
+}
+
+:global(.body-teleported-menu .dropdown-item:disabled) {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+:global(.body-teleported-menu .menu-divider) {
+  margin: 4px 0;
+  border: none;
+  border-top: 1px solid var(--gray-100);
 }
 </style>

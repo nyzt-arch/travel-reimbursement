@@ -33,7 +33,7 @@ defineProps({
             </div>
             <div class="card-info-area">
               <span class="card-label">补助总金额</span>
-              <span class="card-value font-mono">CNY {{ formatAmount(model.subsidyTotal) }}</span>
+              <span class="card-value font-mono">{{ formatAmount(model.subsidyTotal) }}</span>
             </div>
           </div>
 
@@ -44,7 +44,7 @@ defineProps({
             </div>
             <div class="card-info-area">
               <span class="card-label">餐费补助合计</span>
-              <span class="card-value font-mono">CNY {{ formatAmount(model.mealSubsidyTotal) }}</span>
+              <span class="card-value font-mono">{{ formatAmount(model.mealSubsidyTotal) }}</span>
             </div>
           </div>
 
@@ -55,7 +55,7 @@ defineProps({
             </div>
             <div class="card-info-area">
               <span class="card-label">交通补助合计</span>
-              <span class="card-value font-mono">CNY {{ formatAmount(model.transportSubsidyTotal) }}</span>
+              <span class="card-value font-mono">{{ formatAmount(model.transportSubsidyTotal) }}</span>
             </div>
           </div>
 
@@ -66,7 +66,7 @@ defineProps({
             </div>
             <div class="card-info-area">
               <span class="card-label">通讯补助合计</span>
-              <span class="card-value font-mono">CNY {{ formatAmount(model.commSubsidyTotal) }}</span>
+              <span class="card-value font-mono">{{ formatAmount(model.commSubsidyTotal) }}</span>
             </div>
           </div>
         </div>

@@ -1,7 +1,54 @@
-// 作用：存放与报销单全生命周期操作相关的接口函数：
-// 获取报销单列表（支持分页、根据筛选条件查询） (GET /api/reimbursement/list)
-// 获取单张报销单的完整详情 (GET /api/reimbursement/detail/{id})
-// 保存报销单草稿 (POST /api/reimbursement/save)
-// 提交报销单（发起流程） (POST /api/reimbursement/submit)
-// 删除单据 (DELETE /api/reimbursement/delete/{id})
-// 作废单据 (PUT /api/reimbursement/cancel/{id})
+// 修改原因：
+// 提供与后端 ReimbursementController 中 REST 接口映射一致的网络请求函数。
+
+import request from './request';
+import type { Reimbursement } from '../types';
+
+// 定义查询参数的强类型接口
+export interface ReimbursementQueryParams {
+  reimNo?: string;
+  title?: string;
+  reason?: string;
+  companyId?: string;
+  deptId?: string;
+  reimburserId?: string;
+  businessTypeId?: string;
+  pageNum: number;
+  pageSize: number;
+}
+
+// 定义后端分页返回值的强类型接口
+export interface PageResult<T> {
+  records: T[];
+  total: number;
+}
+
+// 获取分页列表（使用具体类型替代 any）
+export function getReimbursementList(params: ReimbursementQueryParams): Promise<PageResult<Reimbursement>> {
+  return request.get('/reimbursement/list', { params });
+}
+// 加载单条明细
+export function getReimbursementDetail(id: string): Promise<Reimbursement> {
+  return request.get(`/reimbursement/detail/${id}`);
+}
+
+// 保存草稿
+export function saveDraft(data: Reimbursement): Promise<string> {
+  return request.post('/reimbursement/save', data);
+}
+
+// 正式提交
+export function submitSheet(data: Reimbursement): Promise<void> {
+  return request.post('/reimbursement/submit', data);
+}
+
+// 删除单据
+export function deleteReimbursement(id: string): Promise<void> {
+  return request.delete(`/reimbursement/delete/${id}`);
+}
+
+// 作废单据
+export function cancelReimbursement(id: string): Promise<void> {
+  return request.put(`/reimbursement/cancel/${id}`);
+}
+

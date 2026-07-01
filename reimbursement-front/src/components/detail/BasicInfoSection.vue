@@ -6,11 +6,13 @@ import SectionHeader from '../common/SectionHeader.vue'
 import FormField from '../common/FormField.vue'
 import TreeSelect from '../TreeSelect.vue'
 
+//子组件声明接受父组件传入参数的代码
 defineProps({
   model: {
     type: Object,
     required: true,
   },
+  //控制组件折叠/展开状态
   collapsed: {
     type: Boolean,
     required: true,
@@ -18,6 +20,10 @@ defineProps({
   errors: {
     type: Object,
     default: () => ({}),
+  },
+  isReadOnly: {
+    type: Boolean,
+    default: false,
   },
 })
 
@@ -39,6 +45,7 @@ const baseDataStore = useBaseDataStore()
                 v-model="model.title"
                 placeholder="请输入报销标题"
                 maxlength="500"
+                :disabled="isReadOnly"
               />
             </FormField>
           </div>
@@ -46,7 +53,7 @@ const baseDataStore = useBaseDataStore()
           <!-- Row 2: Person, Dept, Company -->
           <div class="form-col">
             <FormField label="报销人" required :error="errors.reimburserId">
-              <select v-model="model.reimburserId">
+              <select v-model="model.reimburserId" :disabled="isReadOnly">
                 <option value="">请选择报销人</option>
                 <option v-for="e in baseDataStore.employees" :key="e.id" :value="e.id">
                   {{ e.name }} [{{ e.no }}]
@@ -57,7 +64,7 @@ const baseDataStore = useBaseDataStore()
 
           <div class="form-col">
             <FormField label="报销部门" required :error="errors.reimDepartmentId">
-              <select v-model="model.reimDepartmentId">
+              <select v-model="model.reimDepartmentId" :disabled="isReadOnly">
                 <option value="">请选择报销部门</option>
                 <option v-for="d in baseDataStore.departments" :key="d.id" :value="d.id">
                   [{{ d.no }}] {{ d.name }}
@@ -68,7 +75,7 @@ const baseDataStore = useBaseDataStore()
 
           <div class="form-col">
             <FormField label="费用归属公司" required :error="errors.reimCompanyId">
-              <select v-model="model.reimCompanyId">
+              <select v-model="model.reimCompanyId" :disabled="isReadOnly">
                 <option value="">请选择费用归属公司</option>
                 <option v-for="c in baseDataStore.companies" :key="c.id" :value="c.id">
                   {{ c.name }}
@@ -84,6 +91,7 @@ const baseDataStore = useBaseDataStore()
                 v-model="model.businessTypeId"
                 :options="baseDataStore.businessTypes"
                 placeholder="请选择业务类型"
+                :disabled="isReadOnly"
               />
             </FormField>
           </div>
@@ -96,6 +104,7 @@ const baseDataStore = useBaseDataStore()
                 placeholder="请说明本次出差的具体业务背景与工作内容"
                 rows="3"
                 maxlength="500"
+                :disabled="isReadOnly"
               ></textarea>
             </FormField>
           </div>

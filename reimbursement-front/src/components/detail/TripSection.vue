@@ -14,6 +14,10 @@ const props = defineProps({
   collapsed: {
     type: Boolean,
     required: true
+  },
+  isReadOnly: {
+    type: Boolean,
+    default: false
   }
 });
 
@@ -97,7 +101,7 @@ const handleSaveTrip = (tripForm: Trip) => {
     >
       <template #actions>
         <button 
-          v-show="!collapsed" 
+          v-show="!collapsed && !isReadOnly" 
           class="btn-add-text" 
           @click.stop="openAddDialog"
         >
@@ -117,13 +121,13 @@ const handleSaveTrip = (tripForm: Trip) => {
                 <th style="width: 220px;">出差日期</th>
                 <th style="width: 180px;">行程</th>
                 <th>行程说明</th>
-                <th style="width: 110px;" class="text-center">操作</th>
+                <th v-if="!isReadOnly" style="width: 110px;" class="text-center">操作</th>
               </tr>
             </thead>
             <tbody>
               <tr v-if="!model.trips || model.trips.length === 0">
-                <td colspan="6" class="empty-cell">
-                  暂无行程信息，请点击右上角进行“补录行程”
+                <td :colspan="isReadOnly ? 5 : 6" class="empty-cell">
+                  暂无行程信息{{ isReadOnly ? '' : '，请点击右上角进行“补录行程”' }}
                 </td>
               </tr>
               <tr v-for="(trip, idx) in model.trips" :key="trip.id">
@@ -135,7 +139,7 @@ const handleSaveTrip = (tripForm: Trip) => {
                   {{ baseDataStore.getCityNameByNo(trip.arriveCityNo) }}
                 </td>
                 <td class="trip-desc-cell" :title="trip.tripDesc">{{ trip.tripDesc }}</td>
-                <td class="text-center">
+                <td v-if="!isReadOnly" class="text-center">
                   <div class="row-actions">
                     <button class="icon-btn" title="编辑" @click="openEditDialog(trip)">✏️</button>
                     <button class="icon-btn" title="复制" @click="handleCopyTrip(trip)">📋</button>

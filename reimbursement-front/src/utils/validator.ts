@@ -130,7 +130,7 @@ export function validateReimbursement(data: Reimbursement): { isValid: boolean; 
         errors.allocations = `分摊比例合计必须等于 100% (当前为 ${(ratioSum * 100).toFixed(2)}%)`;
         isValid = false;
       } else if (Math.abs(amountSum - data.subsidyTotal) > 0.05) {
-        errors.allocations = `分摊金额合计必须等于补助总金额 (当前差值: CNY ${(amountSum - data.subsidyTotal).toFixed(2)})`;
+        errors.allocations = `分摊金额合计必须等于补助总金额 (当前差值: ${(amountSum - data.subsidyTotal).toFixed(2)})`;
         isValid = false;
       }
     }

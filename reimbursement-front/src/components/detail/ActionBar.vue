@@ -9,6 +9,10 @@ defineProps({
   submitting: {
     type: Boolean,
     default: false
+  },
+  isReadOnly: {
+    type: Boolean,
+    default: false
   }
 });
 
@@ -24,7 +28,7 @@ const emit = defineEmits(['close', 'save', 'submit']);
         </button>
       </div>
       
-      <div class="right-actions">
+      <div v-if="!isReadOnly" class="right-actions">
         <button 
           class="btn btn-secondary btn-save" 
           :disabled="saving || submitting"

@@ -12,6 +12,10 @@ const props = defineProps({
   collapsed: {
     type: Boolean,
     required: true
+  },
+  isReadOnly: {
+    type: Boolean,
+    default: false
   }
 });
 
@@ -39,7 +43,7 @@ const confirmDelete = () => {
     >
       <template #actions>
         <button 
-          v-show="!collapsed" 
+          v-show="!collapsed && !isReadOnly" 
           class="btn-delete-remark" 
           :disabled="!model.remark"
           @click.stop="handleDeleteClick"
@@ -57,6 +61,7 @@ const confirmDelete = () => {
             placeholder="请输入备注说明内容" 
             rows="4"
             maxlength="1000"
+            :disabled="isReadOnly"
           ></textarea>
           <span class="char-counter font-mono">
             {{ model.remark ? model.remark.length : 0 }} / 1000

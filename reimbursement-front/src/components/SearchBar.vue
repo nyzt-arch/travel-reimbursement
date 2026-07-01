@@ -45,28 +45,28 @@ const handleNew = () => {
       <!-- Row 1 -->
       <div class="filter-item">
         <label>报销单号</label>
-        <input 
-          type="text" 
-          v-model="filters.reimNo" 
-          placeholder="请输入报销单号" 
+        <input
+          type="text"
+          v-model="filters.reimNo"
+          placeholder="请输入报销单号"
           @keyup.enter="handleSearch"
         />
       </div>
       <div class="filter-item">
         <label>标题</label>
-        <input 
-          type="text" 
-          v-model="filters.title" 
-          placeholder="请输入标题" 
+        <input
+          type="text"
+          v-model="filters.title"
+          placeholder="请输入标题"
           @keyup.enter="handleSearch"
         />
       </div>
       <div class="filter-item">
         <label>事由</label>
-        <input 
-          type="text" 
-          v-model="filters.reason" 
-          placeholder="请输入事由" 
+        <input
+          type="text"
+          v-model="filters.reason"
+          placeholder="请输入事由"
           @keyup.enter="handleSearch"
         />
       </div>
@@ -101,24 +101,22 @@ const handleNew = () => {
       </div>
       <div class="filter-item business-type-filter">
         <label>业务类型</label>
-        <TreeSelect 
-          v-model="filters.businessTypeId" 
+        <TreeSelect
+          v-model="filters.businessTypeId"
           :options="baseDataStore.businessTypes"
           placeholder="全部"
           @change="handleSearch"
         />
       </div>
-      
+
       <!-- Actions -->
       <div class="filter-actions">
-        <button class="btn btn-secondary" @click="handleReset">清除</button>
-        <button class="btn btn-primary" @click="handleSearch">
-          <span class="btn-icon">🔍</span> 搜索
-        </button>
-        <button class="btn btn-primary btn-add" @click="handleNew">
-          <span class="btn-icon">➕</span> 新增
-        </button>
+        <button class="btn btn-secondary " @click="handleNew">新增</button>
+<button class="btn btn-secondary" @click="handleReset">清除</button>
+<button class="btn btn-secondary btn-search" @click="handleSearch">搜索</button>
+
       </div>
+
     </div>
   </div>
 </template>
@@ -163,7 +161,7 @@ const handleNew = () => {
   font-size: 12px;
 }
 
-.btn-add {
-  background-color: #2563eb;
+.btn-search {
+  background-color: #a6dcdf;
 }
 </style>

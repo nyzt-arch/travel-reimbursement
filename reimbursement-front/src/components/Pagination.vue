@@ -25,32 +25,32 @@ const pages = computed(() => {
   const current = props.currentPage;
   const total = Math.ceil(props.total / props.pageSize) || 1;
   const list: (number | string)[] = [];
-  
+
   if (total <= 7) {
     for (let i = 1; i <= total; i++) list.push(i);
   } else {
     // Always include page 1
     list.push(1);
-    
+
     if (current > 4) {
       list.push('...');
     }
-    
+
     const start = Math.max(2, current - 2);
     const end = Math.min(total - 1, current + 2);
-    
+
     for (let i = start; i <= end; i++) {
       list.push(i);
     }
-    
+
     if (current < total - 3) {
       list.push('...');
     }
-    
+
     // Always include final page
     list.push(total);
   }
-  
+
   return list;
 });
 
@@ -95,11 +95,10 @@ const handleJump = () => {
 
 <template>
   <div class="pagination-container">
-    <div class="page-info">
-      共 <span class="highlight">{{ total }}</span> 条
-    </div>
-    
     <div class="page-controls">
+      <div class="page-info">
+        共{{ total }}条
+      </div>
       <!-- Page Size Selector -->
       <select :value="pageSize" @change="handlePageSizeChange" class="size-select">
         <option :value="10">10 条/页</option>
@@ -109,19 +108,19 @@ const handleJump = () => {
 
       <!-- Navigation Arrows and Numbers -->
       <div class="page-list">
-        <button 
-          class="page-btn arrow-btn" 
+        <button
+          class="page-btn arrow-btn"
           :disabled="currentPage === 1"
           @click="handlePrev"
         >
           &lt;
         </button>
-        
+
         <button
           v-for="(page, index) in pages"
           :key="index"
           class="page-btn"
-          :class="{ 
+          :class="{
             'active': page === currentPage,
             'ellipsis-btn': page === '...'
           }"
@@ -131,8 +130,8 @@ const handleJump = () => {
           {{ page }}
         </button>
 
-        <button 
-          class="page-btn arrow-btn" 
+        <button
+          class="page-btn arrow-btn"
           :disabled="currentPage === Math.ceil(total / pageSize)"
           @click="handleNext"
         >
@@ -143,10 +142,10 @@ const handleJump = () => {
       <!-- Quick Jump -->
       <div class="quick-jump">
         <span>前往</span>
-        <input 
-          type="text" 
-          v-model="jumpPageVal" 
-          @keyup.enter="handleJump" 
+        <input
+          type="text"
+          v-model="jumpPageVal"
+          @keyup.enter="handleJump"
           class="jump-input"
         />
         <span>页</span>
@@ -158,11 +157,15 @@ const handleJump = () => {
 <style scoped>
 .pagination-container {
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-end;
   align-items: center;
-  padding: 16px 20px;
+  padding: 16px 0px;
   font-size: 14px;
   color: var(--text-secondary);
+}
+
+.page-info {
+  margin-right:16px;
 }
 
 .highlight {
