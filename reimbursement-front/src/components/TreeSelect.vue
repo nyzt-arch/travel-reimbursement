@@ -165,12 +165,11 @@ const handleSelectNode = (node: BusinessType) => {
 }
 
 .select-trigger:hover:not(.disabled) {
-  border-color: var(--primary-color);
+  border-color: var(--gray-400);
 }
 
 .select-trigger.open {
-  border-color: var(--primary-color);
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+  border-color: var(--gray-500);
 }
 
 .select-trigger.disabled {

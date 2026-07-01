@@ -28,9 +28,6 @@ defineProps({
         <div class="summary-cards-grid">
           <!-- Total Card -->
           <div class="summary-card highlight-card">
-            <div class="card-icon-area bg-yellow">
-              <span class="card-emoji">💰</span>
-            </div>
             <div class="card-info-area">
               <span class="card-label">补助总金额</span>
               <span class="card-value font-mono">{{ formatAmount(model.subsidyTotal) }}</span>
@@ -39,33 +36,24 @@ defineProps({
 
           <!-- Meal Card -->
           <div class="summary-card">
-            <div class="card-icon-area bg-blue">
-              <span class="card-emoji">🍔</span>
-            </div>
             <div class="card-info-area">
-              <span class="card-label">餐费补助合计</span>
+              <span class="card-label">餐费补助</span>
               <span class="card-value font-mono">{{ formatAmount(model.mealSubsidyTotal) }}</span>
             </div>
           </div>
 
           <!-- Transit Card -->
           <div class="summary-card">
-            <div class="card-icon-area bg-green">
-              <span class="card-emoji">🚗</span>
-            </div>
             <div class="card-info-area">
-              <span class="card-label">交通补助合计</span>
+              <span class="card-label">交通补助</span>
               <span class="card-value font-mono">{{ formatAmount(model.transportSubsidyTotal) }}</span>
             </div>
           </div>
 
           <!-- Comm Card -->
           <div class="summary-card">
-            <div class="card-icon-area bg-purple">
-              <span class="card-emoji">📱</span>
-            </div>
             <div class="card-info-area">
-              <span class="card-label">通讯补助合计</span>
+              <span class="card-label">通讯补助</span>
               <span class="card-value font-mono">{{ formatAmount(model.commSubsidyTotal) }}</span>
             </div>
           </div>
@@ -87,60 +75,33 @@ defineProps({
 }
 
 .summary-cards-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  display: flex;
   gap: 16px;
+  width: 100%;
 }
 
 .summary-card {
   background-color: var(--bg-primary);
   border: 1px solid var(--gray-200);
-  border-radius: var(--radius-md);
-  padding: 16px;
+  border-radius: var(--radius-sm);
+  padding: 8px 16px;
   display: flex;
+  flex: 1;
+  justify-content: center;
   align-items: center;
-  gap: 16px;
 }
 
 .summary-card.highlight-card {
   background-color: #fffbeb;
   border-color: #fde68a;
-  box-shadow: 0 4px 6px -1px rgba(245, 158, 11, 0.05);
-}
-
-.card-icon-area {
-  width: 44px;
-  height: 44px;
-  border-radius: var(--radius-round);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.bg-yellow {
-  background-color: #fef3c7;
-}
-
-.bg-blue {
-  background-color: var(--primary-light);
-}
-
-.bg-green {
-  background-color: var(--success-light);
-}
-
-.bg-purple {
-  background-color: #f3e5f5;
-}
-
-.card-emoji {
-  font-size: 20px;
+  box-shadow: 0 2px 4px -1px rgba(245, 158, 11, 0.05);
 }
 
 .card-info-area {
   display: flex;
-  flex-direction: column;
-  gap: 4px;
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
 }
 
 .card-label {
@@ -154,14 +115,14 @@ defineProps({
 }
 
 .card-value {
-  font-size: 16px;
+  font-size: 14px;
   font-weight: 700;
   color: var(--text-primary);
 }
 
 .summary-card.highlight-card .card-value {
   color: #d97706;
-  font-size: 18px;
+  font-size: 14px;
 }
 
 .font-mono {

@@ -101,28 +101,52 @@ const rebalanceAllocations = (list: CostAllocation[]) => {
   // Row 1 remainder
   const first = list[0];
   if (first) {
-    first.allocRatio = Math.max(0, 1.0 - row2PlusRatioSum);
-    first.allocAmount = Math.max(0, totalAmount - row2PlusAmountSum);
+    first.allocRatio = Math.max(0, Number((1.0 - row2PlusRatioSum).toFixed(4)));
+    first.allocAmount = Math.max(0, Number((totalAmount - row2PlusAmountSum).toFixed(2)));
   }
   
   emit('update-allocations', list);
 };
 
+// Live restrict inputs to ATM-style 2 decimal places
+const handleInputNumberLimit = (event: Event) => {
+  const target = event.target as HTMLInputElement;
+  
+  // Extract only digits from the current input string
+  let digitsStr = target.value.replace(/[^0-9]/g, '');
+  
+  if (!digitsStr) {
+    digitsStr = '0';
+  }
+  
+  // Parse as integer to remove leading zeros
+  const intVal = parseInt(digitsStr, 10);
+  
+  // Format as exactly 2 decimal places (ATM style)
+  target.value = (intVal / 100).toFixed(2);
+};
+
 // Handle Ratio edit on Row 2+
 const handleRatioInput = (index: number, event: Event) => {
+  const target = event.target as HTMLInputElement;
   const list = [...(props.model.allocations || [])];
   const item = list[index];
   if (!item) return;
 
-  const inputVal = Number((event.target as HTMLInputElement).value) / 100;
+  const rawValue = Number(target.value);
   
-  if (isNaN(inputVal) || inputVal < 0) {
+  if (isNaN(rawValue) || rawValue < 0) {
     item.allocRatio = 0;
     item.allocAmount = 0;
-    (event.target as HTMLInputElement).value = '0.00';
+    target.value = '0.00';
     rebalanceAllocations(list);
     return;
   }
+  
+  // Round to 2 decimal places (percentage)
+  const roundedValue = Number(rawValue.toFixed(2));
+  const inputVal = Number((roundedValue / 100).toFixed(4));
+  target.value = roundedValue.toFixed(2);
   
   // Calculate sum of other row 2+ ratios
   let otherSum = 0;
@@ -134,11 +158,11 @@ const handleRatioInput = (index: number, event: Event) => {
   }
   
   // Check if exceeds 100%
-  if (otherSum + inputVal > 1.0) {
+  if (Number((otherSum + inputVal).toFixed(4)) > 1.0) {
     // ∑（第2+行）> 100%, reset input
     item.allocRatio = 0;
     item.allocAmount = 0;
-    (event.target as HTMLInputElement).value = '';
+    target.value = '0.00';
     rebalanceAllocations(list);
     return;
   }
@@ -152,20 +176,25 @@ const handleRatioInput = (index: number, event: Event) => {
 
 // Handle Amount edit on Row 2+
 const handleAmountInput = (index: number, event: Event) => {
+  const target = event.target as HTMLInputElement;
   const list = [...(props.model.allocations || [])];
   const item = list[index];
   if (!item) return;
 
-  const inputVal = Number((event.target as HTMLInputElement).value);
+  const rawValue = Number(target.value);
   const totalAmount = props.model.subsidyTotal || 0;
   
-  if (isNaN(inputVal) || inputVal < 0 || totalAmount === 0) {
+  if (isNaN(rawValue) || rawValue < 0 || totalAmount === 0) {
     item.allocAmount = 0;
     item.allocRatio = 0;
-    (event.target as HTMLInputElement).value = '0.00';
+    target.value = '0.00';
     rebalanceAllocations(list);
     return;
   }
+
+  // Round to 2 decimal places
+  const inputVal = Number(rawValue.toFixed(2));
+  target.value = inputVal.toFixed(2);
   
   // Calculate sum of other row 2+ amounts
   let otherSum = 0;
@@ -180,14 +209,14 @@ const handleAmountInput = (index: number, event: Event) => {
   if (otherSum + inputVal > totalAmount) {
     item.allocAmount = 0;
     item.allocRatio = 0;
-    (event.target as HTMLInputElement).value = '';
+    target.value = '0.00';
     rebalanceAllocations(list);
     return;
   }
   
-  // Set value and link ratio
+  // Set value and link ratio (limited to 4 decimal places, which translates to 2 decimal places percentage)
   item.allocAmount = inputVal;
-  item.allocRatio = Number((inputVal / totalAmount).toFixed(6));
+  item.allocRatio = Number((inputVal / totalAmount).toFixed(4));
   
   rebalanceAllocations(list);
 };
@@ -208,7 +237,7 @@ const handleEqualSplit = () => {
     }
   } else {
     // Equal ratio
-    const splitRatio = Number((1.0 / count).toFixed(6));
+    const splitRatio = Number((1.0 / count).toFixed(4));
     const splitAmount = Number((totalAmount / count).toFixed(2));
     
     // Set for Row 2+
@@ -233,7 +262,7 @@ const handleEqualSplit = () => {
     
     const first = list[0];
     if (first) {
-      first.allocRatio = Number((1.0 - sumRatios).toFixed(6));
+      first.allocRatio = Number((1.0 - sumRatios).toFixed(4));
       first.allocAmount = Number((totalAmount - sumAmounts).toFixed(2));
     }
   }
@@ -272,8 +301,9 @@ const getRatioDisplay = (val: number) => {
                 <th style="width: 260px;">项目</th>
                 <th style="width: 180px;" class="text-right">
                   <div class="header-split-btn">
-                    <span>分摊比例 % *</span>
-                    <button v-if="!isReadOnly" class="split-btn" @click.stop="handleEqualSplit">⟳ 均摊</button>
+                    <span>分摊比例</span>
+                    <button v-if="!isReadOnly" class="split-btn" @click.stop="handleEqualSplit">均摊</button>
+                    <span class="required-star">*</span>
                   </div>
                 </th>
                 <th style="width: 180px;" class="text-right">分摊金额 *</th>
@@ -313,14 +343,13 @@ const getRatioDisplay = (val: number) => {
                 <td>
                   <div class="percent-input-wrapper">
                     <input 
-                      type="number" 
+                      type="text" 
+                      inputmode="decimal"
                       :value="getRatioDisplay(alloc.allocRatio)"
                       :disabled="Number(idx) === 0 || isReadOnly"
                       class="text-right font-mono"
-                      step="0.01"
-                      min="0"
-                      max="100"
-                      @input="handleRatioInput(Number(idx), $event)"
+                      @input="handleInputNumberLimit"
+                      @change="handleRatioInput(Number(idx), $event)"
                     />
                     <span class="percent-symbol">%</span>
                   </div>
@@ -329,24 +358,24 @@ const getRatioDisplay = (val: number) => {
                 <!-- Amount Input (Row 1 is disabled) -->
                 <td>
                   <input 
-                    type="number" 
+                    type="text" 
+                    inputmode="decimal"
                     :value="alloc.allocAmount.toFixed(2)"
                     :disabled="Number(idx) === 0 || isReadOnly"
                     class="text-right font-mono"
-                    step="0.01"
-                    min="0"
-                    @input="handleAmountInput(Number(idx), $event)"
+                    @input="handleInputNumberLimit"
+                    @change="handleAmountInput(Number(idx), $event)"
                   />
                 </td>
                 
                 <!-- Delete row action -->
                 <td v-if="!isReadOnly" class="text-center">
                   <button 
-                    class="delete-icon-btn" 
+                    class="btn-text-action text-danger" 
                     title="删除该行" 
                     @click="handleDeleteClick(alloc.id)"
                   >
-                    🗑️
+                    删除
                   </button>
                 </td>
               </tr>
@@ -454,19 +483,6 @@ const getRatioDisplay = (val: number) => {
   padding-right: 28px;
 }
 
-.delete-icon-btn {
-  background: transparent;
-  border: none;
-  cursor: pointer;
-  font-size: 14px;
-  padding: 4px;
-  border-radius: var(--radius-sm);
-}
-
-.delete-icon-btn:hover {
-  background-color: var(--danger-light);
-}
-
 .totals-row td {
   background-color: #fffbeb !important;
 }
@@ -520,5 +536,10 @@ const getRatioDisplay = (val: number) => {
   max-height: 0;
   padding-top: 0;
   padding-bottom: 0;
+}
+
+.required-star {
+  color: var(--text-secondary);
+  font-weight: bold;
 }
 </style>

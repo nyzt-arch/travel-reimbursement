@@ -24,7 +24,6 @@ defineProps({
 <template>
   <div class="form-field" :class="{ 'inline': inline, 'has-error': error }">
     <label class="field-label">
-      <span v-if="required" class="required-star">*</span>
       {{ label }}
     </label>
     <div class="field-content">
@@ -51,9 +50,11 @@ defineProps({
 }
 
 .form-field.inline .field-label {
-  width: 100px;
-  text-align: right;
+  width: 96px;
+  text-align: left;
   margin-bottom: 0;
+  flex-shrink: 0;
+  white-space: nowrap;
 }
 
 .form-field.inline .field-content {
@@ -93,7 +94,7 @@ defineProps({
 .has-error input:focus,
 .has-error select:focus,
 .has-error textarea:focus {
-  box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.15) !important;
+  border-color: var(--danger-hover) !important;
 }
 
 .fade-enter-active,

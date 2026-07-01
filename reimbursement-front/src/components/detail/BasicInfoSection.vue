@@ -39,7 +39,7 @@ const baseDataStore = useBaseDataStore()
         <div class="form-grid">
           <!-- Row 1: Title (span 3) -->
           <div class="form-row-full">
-            <FormField label="报销标题" required :error="errors.title">
+            <FormField label="报销标题" required :error="errors.title" inline>
               <input
                 type="text"
                 v-model="model.title"
@@ -52,7 +52,7 @@ const baseDataStore = useBaseDataStore()
 
           <!-- Row 2: Person, Dept, Company -->
           <div class="form-col">
-            <FormField label="报销人" required :error="errors.reimburserId">
+            <FormField label="报销人" required :error="errors.reimburserId" inline>
               <select v-model="model.reimburserId" :disabled="isReadOnly">
                 <option value="">请选择报销人</option>
                 <option v-for="e in baseDataStore.employees" :key="e.id" :value="e.id">
@@ -63,7 +63,7 @@ const baseDataStore = useBaseDataStore()
           </div>
 
           <div class="form-col">
-            <FormField label="报销部门" required :error="errors.reimDepartmentId">
+            <FormField label="报销部门" required :error="errors.reimDepartmentId" inline>
               <select v-model="model.reimDepartmentId" :disabled="isReadOnly">
                 <option value="">请选择报销部门</option>
                 <option v-for="d in baseDataStore.departments" :key="d.id" :value="d.id">
@@ -74,7 +74,7 @@ const baseDataStore = useBaseDataStore()
           </div>
 
           <div class="form-col">
-            <FormField label="费用归属公司" required :error="errors.reimCompanyId">
+            <FormField label="费用归属公司" required :error="errors.reimCompanyId" inline>
               <select v-model="model.reimCompanyId" :disabled="isReadOnly">
                 <option value="">请选择费用归属公司</option>
                 <option v-for="c in baseDataStore.companies" :key="c.id" :value="c.id">
@@ -86,7 +86,7 @@ const baseDataStore = useBaseDataStore()
 
           <!-- Row 3: Business Type -->
           <div class="form-row-third">
-            <FormField label="业务类型" required :error="errors.businessTypeId">
+            <FormField label="业务类型" required :error="errors.businessTypeId" inline>
               <TreeSelect
                 v-model="model.businessTypeId"
                 :options="baseDataStore.businessTypes"
@@ -98,7 +98,7 @@ const baseDataStore = useBaseDataStore()
 
           <!-- Row 4: Reason (span 3) -->
           <div class="form-row-full">
-            <FormField label="出差事由" required :error="errors.reason">
+            <FormField label="出差事由" required :error="errors.reason" inline>
               <textarea
                 v-model="model.reason"
                 placeholder="请说明本次出差的具体业务背景与工作内容"

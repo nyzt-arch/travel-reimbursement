@@ -114,31 +114,31 @@ onUnmounted(() => {
               <div class="action-buttons">
                 <!-- View Icon -->
                 <button
-                  class="action-btn"
+                  class="btn-text-action"
                   title="查看报销单"
                   :disabled="loading"
                   @click="handleAction('view', item)"
                 >
-                  📄
+                  查看
                 </button>
                 <!-- Edit Icon -->
                 <button
-                  class="action-btn"
+                  class="btn-text-action"
                   :title="item.status === 2 ? '已作废单据不可编辑' : '编辑报销单'"
                   :disabled="loading || item.status === 2"
                   @click="handleAction('edit', item)"
                 >
-                  ✏️
+                  编辑
                 </button>
                 <!-- More Actions Trigger -->
                 <div class="more-actions-wrapper">
                   <button
-                    class="action-btn more-btn"
+                    class="btn-text-action"
                     title="更多操作"
                     :disabled="loading"
                     @click="toggleMenu(item.id, $event)"
                   >
-                    ⊙
+                    更多
                   </button>
                 </div>
               </div>
@@ -207,7 +207,7 @@ onUnmounted(() => {
     >
       <button
         class="dropdown-item" @click="handleAction('copy', getActiveItem())">
-        📋 复制
+        复制
       </button>
       <!-- Void action is only allowed for completed sheets -->
       <button
@@ -215,13 +215,13 @@ onUnmounted(() => {
         :disabled="getActiveItem()?.status === 2"
         @click="handleAction('void', getActiveItem())"
       >
-        🚫 作废
+        作废
       </button>
       <button
         class="dropdown-item text-danger"
         @click="handleAction('delete', getActiveItem())"
       >
-        🗑️ 删除
+        删除
       </button>
     </div>
   </teleport>
@@ -264,35 +264,6 @@ onUnmounted(() => {
   align-items: center;
   justify-content: center;
   gap: 6px;
-}
-
-.action-btn {
-  background: transparent;
-  border: 1px solid var(--gray-200);
-  width: 28px;
-  height: 28px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: var(--radius-sm);
-  cursor: pointer;
-  font-size: 14px;
-  transition: var(--transition-fast);
-}
-
-.action-btn:hover {
-  background-color: var(--gray-100);
-  border-color: var(--gray-300);
-}
-
-.action-btn:disabled {
-  opacity: 0.4;
-  cursor: not-allowed;
-  background-color: var(--gray-100);
-}
-
-.more-btn {
-  font-size: 12px;
 }
 
 .more-actions-wrapper {

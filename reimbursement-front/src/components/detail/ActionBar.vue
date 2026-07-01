@@ -24,7 +24,7 @@ const emit = defineEmits(['close', 'save', 'submit']);
     <div class="action-container">
       <div class="left-actions">
         <button class="btn btn-secondary" @click="emit('close')">
-          <span>❌</span> 关闭
+          关闭
         </button>
       </div>
       
@@ -34,7 +34,7 @@ const emit = defineEmits(['close', 'save', 'submit']);
           :disabled="saving || submitting"
           @click="emit('save')"
         >
-          <span>💾</span> 保存草稿
+          保存草稿
         </button>
         
         <button 
@@ -42,7 +42,7 @@ const emit = defineEmits(['close', 'save', 'submit']);
           :disabled="saving || submitting"
           @click="emit('submit')"
         >
-          <span>🚀</span> 确认提交
+          确认提交
         </button>
       </div>
     </div>

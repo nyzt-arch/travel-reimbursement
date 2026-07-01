@@ -141,9 +141,9 @@ const handleSaveTrip = (tripForm: Trip) => {
                 <td class="trip-desc-cell" :title="trip.tripDesc">{{ trip.tripDesc }}</td>
                 <td v-if="!isReadOnly" class="text-center">
                   <div class="row-actions">
-                    <button class="icon-btn" title="编辑" @click="openEditDialog(trip)">✏️</button>
-                    <button class="icon-btn" title="复制" @click="handleCopyTrip(trip)">📋</button>
-                    <button class="icon-btn text-danger" title="删除" @click="handleDeleteClick(trip.id)">🗑️</button>
+                    <button class="btn-text-action text-danger" title="删除" @click="handleDeleteClick(trip.id)">删除</button>
+                    <button class="btn-text-action" title="编辑" @click="openEditDialog(trip)">编辑</button>
+                    <button class="btn-text-action" title="复制" @click="handleCopyTrip(trip)">复制</button>
                   </div>
                 </td>
               </tr>
@@ -212,23 +212,6 @@ const handleSaveTrip = (tripForm: Trip) => {
   align-items: center;
   justify-content: center;
   gap: 8px;
-}
-
-.icon-btn {
-  background: transparent;
-  border: none;
-  cursor: pointer;
-  font-size: 14px;
-  padding: 2px 4px;
-  border-radius: var(--radius-sm);
-}
-
-.icon-btn:hover {
-  background-color: var(--gray-100);
-}
-
-.icon-btn.text-danger:hover {
-  background-color: var(--danger-light);
 }
 
 .trip-desc-cell {

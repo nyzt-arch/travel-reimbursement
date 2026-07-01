@@ -141,11 +141,11 @@ const handleSaveCalendar = (newCalendars: SubsidyCalendar[], totalActual: number
                 </td>
                 <td class="text-center">
                   <button 
-                    class="edit-icon-btn" 
+                    class="btn-text-action" 
                     :title="isReadOnly ? '查看补助日历' : '编辑补助日历'" 
                     @click="handleEditSubsidy(sub)"
                   >
-                    {{ isReadOnly ? '👁️' : '✏️' }}
+                    {{ isReadOnly ? '查看' : '编辑' }}
                   </button>
                 </td>
               </tr>
@@ -224,19 +224,6 @@ const handleSaveCalendar = (newCalendars: SubsidyCalendar[], totalActual: number
 
 .primary-text {
   color: var(--primary-color);
-}
-
-.edit-icon-btn {
-  background: transparent;
-  border: none;
-  cursor: pointer;
-  font-size: 14px;
-  padding: 4px;
-  border-radius: var(--radius-sm);
-}
-
-.edit-icon-btn:hover {
-  background-color: var(--gray-100);
 }
 
 .font-mono {

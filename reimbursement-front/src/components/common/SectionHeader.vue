@@ -22,8 +22,6 @@ const emit = defineEmits(['toggle']);
 <template>
   <div class="section-header" :class="{ 'collapsible': collapsible }" @click="collapsible && emit('toggle')">
     <div class="header-left">
-      <!-- Left decorative primary color bar -->
-      <span class="left-bar"></span>
       <h3 class="header-title">{{ title }}</h3>
       <slot name="summary"></slot>
     </div>
@@ -63,13 +61,6 @@ const emit = defineEmits(['toggle']);
   display: flex;
   align-items: center;
   gap: 12px;
-}
-
-.left-bar {
-  width: 4px;
-  height: 18px;
-  background-color: var(--primary-color);
-  border-radius: var(--radius-round);
 }
 
 .header-title {

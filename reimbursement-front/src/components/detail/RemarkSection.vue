@@ -44,11 +44,11 @@ const confirmDelete = () => {
       <template #actions>
         <button 
           v-show="!collapsed && !isReadOnly" 
-          class="btn-delete-remark" 
+          class="btn-text-action text-danger" 
           :disabled="!model.remark"
           @click.stop="handleDeleteClick"
         >
-          🗑️ 删除备注
+          删除备注
         </button>
       </template>
     </SectionHeader>
@@ -60,12 +60,8 @@ const confirmDelete = () => {
             v-model="model.remark" 
             placeholder="请输入备注说明内容" 
             rows="4"
-            maxlength="1000"
             :disabled="isReadOnly"
           ></textarea>
-          <span class="char-counter font-mono">
-            {{ model.remark ? model.remark.length : 0 }} / 1000
-          </span>
         </div>
       </div>
     </transition>
@@ -93,47 +89,9 @@ const confirmDelete = () => {
   border-top: 1px solid var(--gray-200);
 }
 
-.btn-delete-remark {
-  background: transparent;
-  border: none;
-  color: var(--danger-color);
-  font-size: 14px;
-  font-weight: 500;
-  cursor: pointer;
-  padding: 4px 8px;
-  border-radius: var(--radius-sm);
-  transition: var(--transition-fast);
-}
-
-.btn-delete-remark:hover:not(:disabled) {
-  background-color: var(--danger-light);
-}
-
-.btn-delete-remark:disabled {
-  color: var(--text-muted);
-  cursor: not-allowed;
-}
-
 .textarea-wrapper {
   position: relative;
   width: 100%;
-}
-
-.textarea-wrapper textarea {
-  padding-bottom: 28px;
-}
-
-.char-counter {
-  position: absolute;
-  bottom: 8px;
-  right: 12px;
-  font-size: 12px;
-  color: var(--text-muted);
-  pointer-events: none;
-}
-
-.font-mono {
-  font-family: monospace;
 }
 
 /* Section collapse animation */

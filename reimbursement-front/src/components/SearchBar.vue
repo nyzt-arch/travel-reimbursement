@@ -48,7 +48,7 @@ const handleNew = () => {
         <input
           type="text"
           v-model="filters.reimNo"
-          placeholder="请输入报销单号"
+          placeholder="请输入"
           @keyup.enter="handleSearch"
         />
       </div>
@@ -57,7 +57,7 @@ const handleNew = () => {
         <input
           type="text"
           v-model="filters.title"
-          placeholder="请输入标题"
+          placeholder="请输入"
           @keyup.enter="handleSearch"
         />
       </div>
@@ -66,14 +66,18 @@ const handleNew = () => {
         <input
           type="text"
           v-model="filters.reason"
-          placeholder="请输入事由"
+          placeholder="请输入"
           @keyup.enter="handleSearch"
         />
       </div>
       <div class="filter-item">
         <label>费用归属公司</label>
-        <select v-model="filters.companyId" @change="handleSearch">
-          <option value="">全部</option>
+        <select 
+          v-model="filters.companyId" 
+          @change="handleSearch"
+          :class="{ 'placeholder-style': !filters.companyId }"
+        >
+          <option value="">请选择</option>
           <option v-for="c in baseDataStore.companies" :key="c.id" :value="c.id">
             {{ c.name }}
           </option>
@@ -83,8 +87,12 @@ const handleNew = () => {
       <!-- Row 2 -->
       <div class="filter-item">
         <label>报销部门</label>
-        <select v-model="filters.deptId" @change="handleSearch">
-          <option value="">全部</option>
+        <select 
+          v-model="filters.deptId" 
+          @change="handleSearch"
+          :class="{ 'placeholder-style': !filters.deptId }"
+        >
+          <option value="">请选择</option>
           <option v-for="d in baseDataStore.departments" :key="d.id" :value="d.id">
             {{ d.name }}
           </option>
@@ -92,8 +100,12 @@ const handleNew = () => {
       </div>
       <div class="filter-item">
         <label>报销人</label>
-        <select v-model="filters.reimburserId" @change="handleSearch">
-          <option value="">全部</option>
+        <select 
+          v-model="filters.reimburserId" 
+          @change="handleSearch"
+          :class="{ 'placeholder-style': !filters.reimburserId }"
+        >
+          <option value="">请选择</option>
           <option v-for="e in baseDataStore.employees" :key="e.id" :value="e.id">
             {{ e.name }}
           </option>
@@ -104,7 +116,7 @@ const handleNew = () => {
         <TreeSelect
           v-model="filters.businessTypeId"
           :options="baseDataStore.businessTypes"
-          placeholder="全部"
+          placeholder="请选择"
           @change="handleSearch"
         />
       </div>
@@ -131,19 +143,29 @@ const handleNew = () => {
   display: grid;
   grid-template-columns: repeat(4, 1fr);
   gap: 16px;
-  align-items: flex-end;
+  align-items: center;
 }
 
 .filter-item {
   display: flex;
-  flex-direction: column;
-  gap: 6px;
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
 }
 
 .filter-item label {
   font-size: 13px;
   font-weight: 500;
   color: var(--text-secondary);
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+.filter-item input,
+.filter-item select,
+.filter-item > *:not(label) {
+  flex: 1;
+  min-width: 0;
 }
 
 .business-type-filter {
@@ -163,5 +185,13 @@ const handleNew = () => {
 
 .btn-search {
   background-color: #a6dcdf;
+}
+
+select.placeholder-style {
+  color: var(--text-muted);
+}
+
+select.placeholder-style option {
+  color: var(--text-primary);
 }
 </style>
