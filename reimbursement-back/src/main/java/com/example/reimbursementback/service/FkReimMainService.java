@@ -9,10 +9,5 @@ import com.example.reimbursementback.vo.ReimbursementDetailVO;
 import com.example.reimbursementback.vo.ReimbursementListVO;
 
 public interface FkReimMainService extends IService<FkReimMain> {
-    Page<ReimbursementListVO> queryList(ReimbursementQueryDTO queryDTO);
-    ReimbursementDetailVO getDetail(String id);
-    String saveDraft(ReimbursementSaveDTO saveDTO);
-    void submitReimbursement(ReimbursementSaveDTO saveDTO);
-    void deleteReimbursement(String id);
-    void cancelReimbursement(String id);
+   
 }
