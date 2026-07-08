@@ -119,10 +119,8 @@ onUnmounted(() => {
           <tr v-for="(item, idx) in items" :key="item.id">
             <td class="text-center font-mono">{{ idx + 1 }}</td>
 
-            <!-- Actions Column -->
             <td class="text-center">
               <div class="action-buttons">
-                <!-- Submit (draft → completed) -->
                 <button
                   class="btn-text-action btn-icon-only"
                   title="提交报销单"
@@ -136,7 +134,6 @@ onUnmounted(() => {
                     <line x1="9" y1="16" x2="12" y2="16"/>
                   </svg>
                 </button>
-                <!-- Edit Icon -->
                 <button
                   class="btn-text-action btn-icon-only"
                   :title="item.status === 1 ? '审批中单据不可编辑' : (item.status === 2 ? '已作废单据不可编辑' : '编辑报销单')"
@@ -148,7 +145,6 @@ onUnmounted(() => {
                     <polyline points="17 3 21 7 8 20 4 20 4 16 17 3"/>
                   </svg>
                 </button>
-                <!-- More Actions Trigger -->
                 <div class="more-actions-wrapper">
                   <button
                     class="btn-text-action btn-icon-only"
@@ -167,53 +163,43 @@ onUnmounted(() => {
               </div>
             </td>
 
-            <!-- No. link -->
             <td>
               <router-link :to="{ path: `/detail/${item.id}`, query: { mode: 'view' } }" class="link-no">
                 {{ item.reimNo }}
               </router-link>
             </td>
 
-            <!-- Status Badge -->
             <td class="text-center border-right-divider">
               <span v-if="item.status === 0" class="badge badge-draft">草稿</span>
               <span v-else-if="item.status === 1" class="badge badge-completed">审批中</span>
               <span v-else-if="item.status === 2" class="badge badge-cancelled">已作废</span>
             </td>
 
-            <!-- Document Type -->
             <td class="text-center">日常报销单</td>
 
-            <!-- Person -->
+
             <td>{{ item.reimburserName ? `${item.reimburserName}[${item.reimburserNo}]` : baseDataStore.getEmployeeNameById(item.reimburserId) }}</td>
 
-            <!-- Dept -->
             <td>{{ item.reimDepartmentName ? `[${item.reimDepartmentNo}]${item.reimDepartmentName}` : baseDataStore.getDeptNameById(item.reimDepartmentId) }}</td>
 
-            <!-- Company -->
             <td>{{ item.reimCompanyName || baseDataStore.getCompanyNameById(item.reimCompanyId) }}</td>
 
-            <!-- Biz Type -->
             <td>{{ item.businessTypeName || baseDataStore.getBusinessTypeNameById(item.businessTypeId) }}</td>
 
-            <!-- Title -->
             <td>
               <router-link :to="{ path: `/detail/${item.id}`, query: { mode: 'view' } }" class="link-title" :title="item.title">
                 {{ item.title }}
               </router-link>
             </td>
 
-            <!-- Reason -->
             <td class="cell-reason" :title="item.reason">
               {{ item.reason }}
             </td>
 
-            <!-- Subsidy -->
             <td class="text-right font-mono font-bold amount-text">
               {{ formatAmount(item.subsidyTotal) }}
             </td>
 
-            <!-- Date -->
             <td class="font-mono text-muted">{{ formatDate(item.createTime) }}</td>
           </tr>
         </tbody>

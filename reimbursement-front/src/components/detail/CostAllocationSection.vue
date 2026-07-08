@@ -45,7 +45,6 @@ const handleAddRow = () => {
   const currentList = [...(props.model.allocations || [])];
   currentList.push(newRow);
 
-  // Recalculate based on new row count
   rebalanceAllocations(currentList);
 };
 
@@ -68,7 +67,7 @@ const confirmDelete = () => {
   showConfirmDelete.value = false;
 };
 
-// 重新平衡分摊：第一行取余数，保证比例和金额精确
+// （1）自动配平函数  用100%减去第二行到最后一行的比例和金额，赋值给第一行
 const rebalanceAllocations = (list: CostAllocation[]) => {
   const totalAmount = props.model.subsidyTotal || 0;
 
@@ -87,7 +86,6 @@ const rebalanceAllocations = (list: CostAllocation[]) => {
     return;
   }
 
-  // 汇总第 2 行及之后的比例和金额
   let row2PlusRatioSum = 0;
   let row2PlusAmountSum = 0;
 
@@ -98,7 +96,6 @@ const rebalanceAllocations = (list: CostAllocation[]) => {
       row2PlusAmountSum += item.allocAmount;
     }
   }
-
   // 第一行取余数
   const first = list[0];
   if (first) {
@@ -109,25 +106,22 @@ const rebalanceAllocations = (list: CostAllocation[]) => {
   emit('update-allocations', list);
 };
 
-// 输入金额时自动转成两位小数（比如用户输入 1234 变成 12.34）
+// 方便用户输入（比如用户输入 1234 变成 12.34）
 const handleInputNumberLimit = (event: Event) => {
   const target = event.target as HTMLInputElement;
 
-  // Extract only digits from the current input string
   let digitsStr = target.value.replace(/[^0-9]/g, '');
 
   if (!digitsStr) {
     digitsStr = '0';
   }
 
-  // Parse as integer to remove leading zeros
   const intVal = parseInt(digitsStr, 10);
 
-  // Format as exactly 2 decimal places (ATM style)
   target.value = (intVal / 100).toFixed(2);
 };
 
-// 第 2 行之后的比例编辑处理
+// （2）比例输入校验函数  超额的话则归零当前行的比例。正常则联动配平函数
 const handleRatioInput = (index: number, event: Event) => {
   const target = event.target as HTMLInputElement;
   const list = [...(props.model.allocations || [])];
@@ -170,7 +164,7 @@ const handleRatioInput = (index: number, event: Event) => {
   rebalanceAllocations(list);
 };
 
-// 第 2 行之后的金额编辑处理
+// （3）金额输入校验，超额则归零当前数值，正常则联动配平函数
 const handleAmountInput = (index: number, event: Event) => {
   const target = event.target as HTMLInputElement;
   const list = [...(props.model.allocations || [])];
@@ -383,7 +377,6 @@ const getRatioDisplay = (val: number) => {
       </div>
     </transition>
 
-    <!-- Delete confirmation -->
     <ConfirmDialog
       :show="showConfirmDelete"
       title="提示"
@@ -393,7 +386,6 @@ const getRatioDisplay = (val: number) => {
       @cancel="showConfirmDelete = false"
     />
 
-    <!-- Minimum row alert -->
     <ConfirmDialog
       :show="showMinRowAlert"
       title="提示"

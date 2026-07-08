@@ -28,7 +28,7 @@ const model = ref<Reimbursement | null>(null)
 // 查看模式下或者已提交（审批中）、已作废的单据不可编辑
 const isReadOnly = computed(() => route.query.mode === 'view' || model.value?.status === 1 || model.value?.status === 2)
 
-// 控制各个区块折叠/展开
+// 6个区块折叠/展开
 const collapsedStates = reactive({
   basicInfo: false,
   trips: false,
@@ -362,6 +362,7 @@ const confirmClose = () => {
     </header>
 
     <div class="detail-content-area container">
+    <!-- 基本信息，监听@toggle事件来切换状态 -->
       <BasicInfoSection
         :model="model"
         :collapsed="collapsedStates.basicInfo"
@@ -489,7 +490,7 @@ z
 
 .detail-content-area {
   padding-top: 78px;
-  padding-bottom: 80px; /* Allow scrolling past bottom absolute toolbar */
+  padding-bottom: 80px;
 }
 
 .font-mono {

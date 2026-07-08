@@ -66,12 +66,15 @@ public class FkReimMainServiceImpl extends ServiceImpl<FkReimMainMapper, FkReimM
     private static final DateTimeFormatter DATETIME_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
-    //分页查询+条件筛选
     @Override
     public Page<ReimbursementListVO> queryList(ReimbursementQueryDTO queryDTO) {
+
+        //分页查询
         Page<FkReimMain> page = new Page<>(queryDTO.getPageNum(), queryDTO.getPageSize());
+        //动态拼接SQL，防止硬编码。
         LambdaQueryWrapper<FkReimMain> wrapper = new LambdaQueryWrapper<>();
 
+        //接受前端传参，构建SQL拼接条件
         if (StringUtils.hasText(queryDTO.getReimNo())) {
             wrapper.like(FkReimMain::getReimNo, queryDTO.getReimNo());
         }
@@ -97,18 +100,25 @@ public class FkReimMainServiceImpl extends ServiceImpl<FkReimMainMapper, FkReimM
         // 默认按创建时间倒序
         wrapper.orderByDesc(FkReimMain::getCreationTime);
 
+        //分页查询
         Page<FkReimMain> entityPage = this.page(page, wrapper);
+
+        //VO分页空壳
         Page<ReimbursementListVO> voPage = new Page<>(entityPage.getCurrent(), entityPage.getSize(), entityPage.getTotal());
 
+        //数据库查出的实体类转化为VO列表
         List<ReimbursementListVO> voList = entityPage.getRecords().stream().map(entity -> {
             ReimbursementListVO vo = new ReimbursementListVO();
             vo.setId(entity.getId());
             vo.setReimNo(entity.getReimNo());
+
+            //转换数据类型并设置异常时的默认值
             try {
                 vo.setStatus(Integer.valueOf(entity.getStatus()));
             } catch (NumberFormatException e) {
                 vo.setStatus(0);
             }
+
             vo.setReimburserId(entity.getReimburserId());
             vo.setReimburserNo(entity.getReimburserNo());
             vo.setReimburserName(entity.getReimburserName());
@@ -124,8 +134,11 @@ public class FkReimMainServiceImpl extends ServiceImpl<FkReimMainMapper, FkReimM
             vo.setTitle(entity.getReimbursementTitle());
             vo.setReason(entity.getBusinessTripReason());
             vo.setSubsidyTotal(entity.getSubsidyTotal());
+
+            //格式化日期和防空指针
             vo.setCreateTime(entity.getCreationTime() != null ? entity.getCreationTime().format(DATETIME_FORMATTER) : null);
             vo.setUpdateTime(entity.getUpdateTime() != null ? entity.getUpdateTime().format(DATETIME_FORMATTER) : null);
+
             return vo;
         }).collect(Collectors.toList());
 
@@ -133,7 +146,6 @@ public class FkReimMainServiceImpl extends ServiceImpl<FkReimMainMapper, FkReimM
         return voPage;
     }
 
-    //详情
     @Override
     public ReimbursementDetailVO getDetail(String id) {
         FkReimMain entity = this.getById(id);
@@ -142,6 +154,7 @@ public class FkReimMainServiceImpl extends ServiceImpl<FkReimMainMapper, FkReimM
         }
 
         ReimbursementDetailVO vo = new ReimbursementDetailVO();
+
         vo.setId(entity.getId());
         vo.setReimNo(entity.getReimNo());
         vo.setTitle(entity.getReimbursementTitle());
@@ -179,7 +192,7 @@ public class FkReimMainServiceImpl extends ServiceImpl<FkReimMainMapper, FkReimM
             return tripVO;
         }).collect(Collectors.toList()));
 
-        // 2. 查询补助信息列表并关联其日历明细
+        // 2. 查询补助信息列表
         List<FkReimSubsidy> subsidies = subsidyService.getSubsidiesByReimId(id);
         vo.setSubsidies(subsidies.stream().map(s -> {
             ReimbursementDetailVO.SubsidyVO subVO = new ReimbursementDetailVO.SubsidyVO();
@@ -191,14 +204,16 @@ public class FkReimMainServiceImpl extends ServiceImpl<FkReimMainMapper, FkReimM
             subVO.setEndDate(s.getEndDate() != null ? s.getEndDate().format(DATE_FORMATTER) : null);
             subVO.setSubsidyDays(s.getDays());
 
-            // 用 tripId 匹配行程的 arrivalCityNo，作为前端所需的 subsidyCityNo
+            //内存关联查询
             FkReimTrip trip = tripMap.get(s.getTripId());
+
+            //防空指针校验，获取对应城市编号
             subVO.setSubsidyCityNo(trip != null ? trip.getArrivalCityNo() : null);
 
             subVO.setApplyAmount(s.getApplyAmount());
             subVO.setSubsidyAmount(s.getSubsidyAmount());
 
-            // 查询该条补助对应的日历明细
+            // 该补助信息对应的日历明细
             List<FkReimSubsidyCalendar> calendars = calendarService.getCalendarsBySubsidyId(s.getId());
             subVO.setCalendars(calendars.stream().map(c -> {
                 ReimbursementDetailVO.CalendarVO calVO = new ReimbursementDetailVO.CalendarVO();
@@ -210,17 +225,18 @@ public class FkReimMainServiceImpl extends ServiceImpl<FkReimMainMapper, FkReimM
                 // 将数据库冗余的 cityName (实际存 cityNo) 传递给前端的 cityNo 字段
                 calVO.setCityNo(c.getCityName());
 
+                // 餐补，交通补贴，通讯补贴
+                //用户不勾选时将null异常设为状态0，未勾选
                 try { calVO.setMealChecked(Integer.valueOf(c.getMealChecked())); } catch (Exception e) { calVO.setMealChecked(0); }
                 calVO.setMealStandard(c.getMealStandard());
                 calVO.setMealAmount(c.getMealAmount());
-
                 try { calVO.setTransportChecked(Integer.valueOf(c.getTransportChecked())); } catch (Exception e) { calVO.setTransportChecked(0); }
                 calVO.setTransportStandard(c.getTransportStandard());
                 calVO.setTransportAmount(c.getTransportAmount());
-
                 try { calVO.setCommChecked(Integer.valueOf(c.getPhoneChecked())); } catch (Exception e) { calVO.setCommChecked(0); }
                 calVO.setCommStandard(c.getPhoneStandard());
                 calVO.setCommAmount(c.getPhoneAmount());
+
                 return calVO;
             }).collect(Collectors.toList()));
 
@@ -244,7 +260,6 @@ public class FkReimMainServiceImpl extends ServiceImpl<FkReimMainMapper, FkReimM
         return vo;
     }
 
-    //保存
     @Override
     @Transactional(rollbackFor = Exception.class)
     public String saveDraft(ReimbursementSaveDTO saveDTO) {
@@ -255,7 +270,7 @@ public class FkReimMainServiceImpl extends ServiceImpl<FkReimMainMapper, FkReimM
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void submitReimbursement(ReimbursementSaveDTO saveDTO) {
-        // 核心表单属性必填校验
+        // 基础属性校验
         if (!StringUtils.hasText(saveDTO.getTitle())) {
             throw new RuntimeException("报销单标题不能为空！");
         }
@@ -284,6 +299,7 @@ public class FkReimMainServiceImpl extends ServiceImpl<FkReimMainMapper, FkReimM
 
         BigDecimal ratioSum = BigDecimal.ZERO;
         BigDecimal amountSum = BigDecimal.ZERO;
+
         for (ReimbursementSaveDTO.CostAllocationDTO alloc : saveDTO.getAllocations()) {
             ratioSum = ratioSum.add(alloc.getAllocRatio() != null ? alloc.getAllocRatio() : BigDecimal.ZERO);
             amountSum = amountSum.add(alloc.getAllocAmount() != null ? alloc.getAllocAmount() : BigDecimal.ZERO);
@@ -294,6 +310,7 @@ public class FkReimMainServiceImpl extends ServiceImpl<FkReimMainMapper, FkReimM
         }
 
         BigDecimal subsidyTotal = saveDTO.getSubsidyTotal() != null ? saveDTO.getSubsidyTotal() : BigDecimal.ZERO;
+
         if (amountSum.compareTo(subsidyTotal) != 0) {
             throw new RuntimeException("费用分摊金额之和(" + amountSum + ")必须等于补助总金额(" + subsidyTotal + ")！");
         }
@@ -305,11 +322,11 @@ public class FkReimMainServiceImpl extends ServiceImpl<FkReimMainMapper, FkReimM
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void deleteReimbursement(String id) {
-        // 级联清空关联子表
+        // 清除子表
         tripService.deleteTripsByReimId(id);
-        subsidyService.deleteSubsidiesByReimId(id); // 内部会同步清理 calendar
+        subsidyService.deleteSubsidiesByReimId(id);
         costAllocationService.deleteAllocationsByReimId(id);
-        // 删除主单
+        // 清除主表
         this.removeById(id);
     }
 
@@ -319,13 +336,14 @@ public class FkReimMainServiceImpl extends ServiceImpl<FkReimMainMapper, FkReimM
     public void cancelReimbursement(String id) {
         FkReimMain main = this.getById(id);
         if (main != null) {
-            main.setStatus("2"); // 已作废
+            main.setStatus("2");
             main.setUpdateTime(LocalDateTime.now());
             this.updateById(main);
         }
     }
 
-    //私有方法生成报销单号
+
+    //核心私有方法
     private String saveOrUpdateMain(ReimbursementSaveDTO saveDTO, String status) {
         boolean isNew = false;
         FkReimMain main = new FkReimMain();
@@ -333,8 +351,9 @@ public class FkReimMainServiceImpl extends ServiceImpl<FkReimMainMapper, FkReimM
         boolean shouldCreateNew = saveDTO.getId() == null || saveDTO.getId().trim().isEmpty()
                 || saveDTO.getId().startsWith("NEW_")
                 || saveDTO.getId().startsWith("COPY_")
-                || saveDTO.getId().startsWith("R");
+                || saveDTO.getId().startsWith("R");     //测试时用的前缀
 
+        //修改已有的报销单时，保持单号和创建时间不变
         if (!shouldCreateNew) {
             main.setId(saveDTO.getId());
             FkReimMain existing = this.getById(saveDTO.getId());
@@ -346,18 +365,21 @@ public class FkReimMainServiceImpl extends ServiceImpl<FkReimMainMapper, FkReimM
             }
         }
 
+        //生成唯一报销单号
         if (shouldCreateNew) {
             isNew = true;
             main.setId(null);
             main.setCreationTime(LocalDateTime.now());
             String dateStr = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
-            String prefix = "RCBX" + dateStr;
+            String prefix = "RCBX" + dateStr;   //前缀RCBX+创建的年月日
+
+            //统计今天已有的单据数量
             Long todayCount = this.count(new LambdaQueryWrapper<FkReimMain>().like(FkReimMain::getReimNo, prefix + "%"));
             String reimNo = prefix + String.format("%03d", todayCount + 1);
             main.setReimNo(reimNo);
         }
 
-        // 根据Id补录冗余字段
+        // 根据Id补齐编号，姓名这些信息
         if (saveDTO.getReimburserId() != null) {
             BaseEmployee emp = baseEmployeeMapper.selectById(saveDTO.getReimburserId());
             if (emp != null) {
@@ -391,6 +413,7 @@ public class FkReimMainServiceImpl extends ServiceImpl<FkReimMainMapper, FkReimM
             }
         }
 
+        //将用户通过DTO传入的数据赋值给entity对象
         main.setReimbursementTitle(saveDTO.getTitle());
         main.setBusinessTripReason(saveDTO.getReason());
         main.setSubsidyTotal(saveDTO.getSubsidyTotal());
@@ -406,10 +429,10 @@ public class FkReimMainServiceImpl extends ServiceImpl<FkReimMainMapper, FkReimM
         this.saveOrUpdate(main);
         String reimId = main.getId();
 
-        // 2. 如果是修改，清空历史从表
+        // 2. 清空旧数据
         if (!isNew) {
             tripService.deleteTripsByReimId(reimId);
-            subsidyService.deleteSubsidiesByReimId(reimId); // 连同 calendar 一并清除
+            subsidyService.deleteSubsidiesByReimId(reimId);
             costAllocationService.deleteAllocationsByReimId(reimId);
         }
 
@@ -430,9 +453,9 @@ public class FkReimMainServiceImpl extends ServiceImpl<FkReimMainMapper, FkReimM
                 }
 
                 trip.setReimId(reimId);
-                trip.setPersonId(tripDTO.getTravelerId());
 
                 // 补全出行人员工号姓名
+                trip.setPersonId(tripDTO.getTravelerId());
                 if (tripDTO.getTravelerId() != null) {
                     BaseEmployee emp = baseEmployeeMapper.selectById(tripDTO.getTravelerId());
                     if (emp != null) {
@@ -441,6 +464,7 @@ public class FkReimMainServiceImpl extends ServiceImpl<FkReimMainMapper, FkReimM
                     }
                 }
 
+                // 补全出发城市
                 trip.setDepartureCityNo(tripDTO.getDepartCityNo());
                 if (tripDTO.getDepartCityNo() != null) {
                     BaseCity departureCity = baseCityMapper.selectById(tripDTO.getDepartCityNo());
@@ -449,6 +473,7 @@ public class FkReimMainServiceImpl extends ServiceImpl<FkReimMainMapper, FkReimM
                     }
                 }
 
+                //补全到达城市
                 trip.setArrivalCityNo(tripDTO.getArriveCityNo());
                 if (tripDTO.getArriveCityNo() != null) {
                     BaseCity arrivalCity = baseCityMapper.selectById(tripDTO.getArriveCityNo());
@@ -457,17 +482,23 @@ public class FkReimMainServiceImpl extends ServiceImpl<FkReimMainMapper, FkReimM
                     }
                 }
 
+                //填充时间
                 trip.setStartDate(tripDTO.getDepartDate() != null ? LocalDate.parse(tripDTO.getDepartDate(), DATE_FORMATTER) : null);
                 trip.setEndDate(tripDTO.getArriveDate() != null ? LocalDate.parse(tripDTO.getArriveDate(), DATE_FORMATTER) : null);
+
+                //行程描述与行程序号
                 trip.setTripDesc(tripDTO.getTripDesc());
                 trip.setSortOrder(sort++);
+
                 trip.setCreationTime(LocalDateTime.now());
                 trip.setUpdateTime(LocalDateTime.now());
 
+                //收集数据批量保存
                 tripEntities.add(trip);
             }
             tripService.saveBatch(tripEntities);
 
+            //双指针遍历,将前端临时行程ID,替换为数据库中的真实ID
             if (saveDTO.getSubsidies() != null) {
                 for (int i = 0; i < saveDTO.getTrips().size(); i++) {
                     String frontTripId = saveDTO.getTrips().get(i).getId();
@@ -480,6 +511,7 @@ public class FkReimMainServiceImpl extends ServiceImpl<FkReimMainMapper, FkReimM
                     }
                 }
             }
+
         }
 
         // 4. 保存补助信息明细 & 补助日历明细
@@ -504,9 +536,10 @@ public class FkReimMainServiceImpl extends ServiceImpl<FkReimMainMapper, FkReimM
                 }
 
                 allocation.setReimId(reimId);
-                allocation.setCompanyId(allocDTO.getCompanyId());
 
-                // 补全归属公司编号/姓名
+
+                // 补全归属公司编号/名称
+                allocation.setCompanyId(allocDTO.getCompanyId());
                 if (allocDTO.getCompanyId() != null) {
                     BaseCompany comp = baseCompanyMapper.selectById(allocDTO.getCompanyId());
                     if (comp != null) {
@@ -515,8 +548,8 @@ public class FkReimMainServiceImpl extends ServiceImpl<FkReimMainMapper, FkReimM
                     }
                 }
 
-                allocation.setProjectId(allocDTO.getProjectId());
                 // 补全项目信息
+                allocation.setProjectId(allocDTO.getProjectId());
                 if (allocDTO.getProjectId() != null) {
                     BaseProject proj = baseProjectMapper.selectById(allocDTO.getProjectId());
                     if (proj != null) {
