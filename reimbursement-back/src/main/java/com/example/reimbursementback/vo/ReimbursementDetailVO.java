@@ -1,6 +1,5 @@
 package com.example.reimbursementback.vo;
 
-import com.example.reimbursementback.dto.ReimbursementSaveDTO;
 import lombok.Data;
 import java.math.BigDecimal;
 import java.util.List;
@@ -25,13 +24,13 @@ public class ReimbursementDetailVO {
     private List<SubsidyVO> subsidies;
     private List<CostAllocationVO> allocations;
 
-    //费用合计
+    // 费用合计
     private BigDecimal subsidyTotal;
     private BigDecimal mealSubsidyTotal;
     private BigDecimal transportSubsidyTotal;
-    private BigDecimal commSubsidyTotal;//通讯补助
+    private BigDecimal commSubsidyTotal;// 通讯补助
 
-    //备注
+    // 备注
     private String remark;
 
     // 补录行程
@@ -89,7 +88,7 @@ public class ReimbursementDetailVO {
     public static class CostAllocationVO {
         private String id; // 分摊明细ID
         private String reimId; // 关联主表ID
-        private String companyId; //费用归属
+        private String companyId; // 费用归属
         private String projectId;
         private BigDecimal allocRatio;
         private BigDecimal allocAmount;
