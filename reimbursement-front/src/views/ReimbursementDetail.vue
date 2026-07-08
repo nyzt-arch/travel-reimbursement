@@ -25,8 +25,8 @@ const baseDataStore = useBaseDataStore()
 // 当前报销单数据
 const model = ref<Reimbursement | null>(null)
 
-// 查看模式下或者已作废的单据不可编辑
-const isReadOnly = computed(() => route.query.mode === 'view' || model.value?.status === 2)
+// 查看模式下或者已提交（审批中）、已作废的单据不可编辑
+const isReadOnly = computed(() => route.query.mode === 'view' || model.value?.status === 1 || model.value?.status === 2)
 
 // 控制各个区块折叠/展开
 const collapsedStates = reactive({
@@ -435,7 +435,7 @@ const confirmClose = () => {
         }
       "
     />
-
+z
     <ConfirmDialog
       :show="showValidationError"
       title="校验未通过"

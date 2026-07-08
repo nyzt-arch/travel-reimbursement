@@ -139,8 +139,8 @@ onUnmounted(() => {
                 <!-- Edit Icon -->
                 <button
                   class="btn-text-action btn-icon-only"
-                  :title="item.status === 2 ? '已作废单据不可编辑' : '编辑报销单'"
-                  :disabled="loading || item.status === 2"
+                  :title="item.status === 1 ? '审批中单据不可编辑' : (item.status === 2 ? '已作废单据不可编辑' : '编辑报销单')"
+                  :disabled="loading || item.status !== 0"
                   @click="handleAction('edit', item)"
                 >
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">

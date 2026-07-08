@@ -66,7 +66,7 @@ public class FkReimMainServiceImpl extends ServiceImpl<FkReimMainMapper, FkReimM
     private static final DateTimeFormatter DATETIME_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 
-    //分页查询+多条件筛选
+    //分页查询+条件筛选
     @Override
     public Page<ReimbursementListVO> queryList(ReimbursementQueryDTO queryDTO) {
         Page<FkReimMain> page = new Page<>(queryDTO.getPageNum(), queryDTO.getPageSize());
@@ -133,7 +133,7 @@ public class FkReimMainServiceImpl extends ServiceImpl<FkReimMainMapper, FkReimM
         return voPage;
     }
 
-    //点击单号/标题 查看报销单详情
+    //详情
     @Override
     public ReimbursementDetailVO getDetail(String id) {
         FkReimMain entity = this.getById(id);
@@ -244,14 +244,14 @@ public class FkReimMainServiceImpl extends ServiceImpl<FkReimMainMapper, FkReimM
         return vo;
     }
 
-    //保存草稿
+    //保存
     @Override
     @Transactional(rollbackFor = Exception.class)
     public String saveDraft(ReimbursementSaveDTO saveDTO) {
         return saveOrUpdateMain(saveDTO, "0");
     }
 
-    //提交报销单
+    //提交
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void submitReimbursement(ReimbursementSaveDTO saveDTO) {
@@ -301,7 +301,7 @@ public class FkReimMainServiceImpl extends ServiceImpl<FkReimMainMapper, FkReimM
         saveOrUpdateMain(saveDTO, "1");
     }
 
-    //删除报销单
+    //删除
     @Override
     @Transactional(rollbackFor = Exception.class)
     public void deleteReimbursement(String id) {
@@ -325,12 +325,11 @@ public class FkReimMainServiceImpl extends ServiceImpl<FkReimMainMapper, FkReimM
         }
     }
 
-    //自动生成报销单号（私有方法）
+    //私有方法生成报销单号
     private String saveOrUpdateMain(ReimbursementSaveDTO saveDTO, String status) {
         boolean isNew = false;
         FkReimMain main = new FkReimMain();
 
-        // 识别是新增，还是修改时主单已不存在（回退为新增流程）
         boolean shouldCreateNew = saveDTO.getId() == null || saveDTO.getId().trim().isEmpty()
                 || saveDTO.getId().startsWith("NEW_")
                 || saveDTO.getId().startsWith("COPY_")
@@ -347,12 +346,10 @@ public class FkReimMainServiceImpl extends ServiceImpl<FkReimMainMapper, FkReimM
             }
         }
 
-        // 统一处理主单据的初始化和单号生成逻辑，避免代码冗余
         if (shouldCreateNew) {
             isNew = true;
             main.setId(null);
             main.setCreationTime(LocalDateTime.now());
-            // 自动生成报销单号
             String dateStr = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
             String prefix = "RCBX" + dateStr;
             Long todayCount = this.count(new LambdaQueryWrapper<FkReimMain>().like(FkReimMain::getReimNo, prefix + "%"));
@@ -360,7 +357,7 @@ public class FkReimMainServiceImpl extends ServiceImpl<FkReimMainMapper, FkReimM
             main.setReimNo(reimNo);
         }
 
-        // 主表冗余字段查库补录
+        // 根据Id补录冗余字段
         if (saveDTO.getReimburserId() != null) {
             BaseEmployee emp = baseEmployeeMapper.selectById(saveDTO.getReimburserId());
             if (emp != null) {
@@ -404,9 +401,6 @@ public class FkReimMainServiceImpl extends ServiceImpl<FkReimMainMapper, FkReimM
         main.setStatus(status);
         main.setUpdateTime(LocalDateTime.now());
 
-        // 统一填入创建人（冗余演示）
-        main.setCreateUserId("system");
-        main.setCreateUserName("系统管理员");
 
         // 1. 保存/更新主表
         this.saveOrUpdate(main);
@@ -474,7 +468,6 @@ public class FkReimMainServiceImpl extends ServiceImpl<FkReimMainMapper, FkReimM
             }
             tripService.saveBatch(tripEntities);
 
-            // 修改前端传来的 tripId 占位符，匹配最新的数据库生成主键ID (为 subsidy 明细关联做准备)
             if (saveDTO.getSubsidies() != null) {
                 for (int i = 0; i < saveDTO.getTrips().size(); i++) {
                     String frontTripId = saveDTO.getTrips().get(i).getId();
@@ -537,12 +530,10 @@ public class FkReimMainServiceImpl extends ServiceImpl<FkReimMainMapper, FkReimM
                 allocation.setSortOrder(sort++);
                 allocation.setCreationTime(LocalDateTime.now());
                 allocation.setUpdateTime(LocalDateTime.now());
-
                 allocEntities.add(allocation);
             }
             costAllocationService.saveBatch(allocEntities);
         }
-
         return reimId;
     }
 }
