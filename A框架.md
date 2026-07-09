@@ -18,12 +18,7 @@ travel-reimbursement/
 │           ├── vo/
 │           │   ├── ReimbursementDetailVO.java   
 │           │   └── ReimbursementListVO.java    
-│           ├── mapper/    #继承了BaseMapper接口
-│           │   ├── FkReimCostAllocationMapper.java
-│           │   ├── FkReimMainMapper.java
-│           │   ├── FkReimSubsidyCalendarMapper.java
-│           │   ├── FkReimSubsidyMapper.java
-│           │   └── FkReimTripMapper.java
+│           ├── mapperh
 │           └── service/
 │           │   ├── FkReimCostAllocationService.java
 │           │   ├── FkReimMainService.java

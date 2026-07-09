@@ -67,7 +67,7 @@ const confirmDelete = () => {
   showConfirmDelete.value = false;
 };
 
-// （1）自动配平函数  用100%减去第二行到最后一行的比例和金额，赋值给第一行
+// （1）自动配平函数
 const rebalanceAllocations = (list: CostAllocation[]) => {
   const totalAmount = props.model.subsidyTotal || 0;
 
@@ -86,6 +86,7 @@ const rebalanceAllocations = (list: CostAllocation[]) => {
     return;
   }
 
+  // 汇总第 2 行及之后的比例和金额
   let row2PlusRatioSum = 0;
   let row2PlusAmountSum = 0;
 
@@ -96,6 +97,7 @@ const rebalanceAllocations = (list: CostAllocation[]) => {
       row2PlusAmountSum += item.allocAmount;
     }
   }
+
   // 第一行取余数
   const first = list[0];
   if (first) {
@@ -121,7 +123,7 @@ const handleInputNumberLimit = (event: Event) => {
   target.value = (intVal / 100).toFixed(2);
 };
 
-// （2）比例输入校验函数  超额的话则归零当前行的比例。正常则联动配平函数
+// （2）比例输入校验函数
 const handleRatioInput = (index: number, event: Event) => {
   const target = event.target as HTMLInputElement;
   const list = [...(props.model.allocations || [])];
@@ -164,7 +166,7 @@ const handleRatioInput = (index: number, event: Event) => {
   rebalanceAllocations(list);
 };
 
-// （3）金额输入校验，超额则归零当前数值，正常则联动配平函数
+// （3）金额输入校验函数
 const handleAmountInput = (index: number, event: Event) => {
   const target = event.target as HTMLInputElement;
   const list = [...(props.model.allocations || [])];
