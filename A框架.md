@@ -18,7 +18,7 @@ travel-reimbursement/
 │           ├── vo/
 │           │   ├── ReimbursementDetailVO.java   
 │           │   └── ReimbursementListVO.java    
-│           ├── mapperh
+│           ├── mapper/
 │           └── service/
 │           │   ├── FkReimCostAllocationService.java
 │           │   ├── FkReimMainService.java
